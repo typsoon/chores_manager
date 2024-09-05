@@ -1,0 +1,1 @@
+DROP SCHEMA chores_manager CASCADE ;
