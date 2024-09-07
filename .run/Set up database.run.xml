@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Set up database" type="DatabaseScript">
+    <script-file value="$PROJECT_DIR$/database/clear.sql" />
+    <script-file value="$PROJECT_DIR$/database/createTables.sql" />
+    <script-file value="$PROJECT_DIR$/database/createPrivateViews.sql" />
+    <script-file value="$PROJECT_DIR$/database/createFunctions.sql" />
+    <script-file value="$PROJECT_DIR$/database/createViews.sql" />
+    <script-file value="$PROJECT_DIR$/database/concat.py" />
+    <script-mode>FILE</script-mode>
+    <data-source id="3b67e0c1-2bdc-499f-806e-cf88fb8322e1" />
+    <method v="2" />
+  </configuration>
+</component>
