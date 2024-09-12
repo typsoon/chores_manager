@@ -1,3 +1,4 @@
 pub mod model;
-mod viewmodel;
+pub mod viewmodel;
 mod view;
+// TODO: make this better

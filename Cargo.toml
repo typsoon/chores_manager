@@ -1,9 +1,12 @@
 [package]
-name = "Chores-Manager"
+name = "chores_manager"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 chrono = "0.4.38"
-diesel = { version ="2.2.4", features = ["postgres"] }
+delegate = "0.13.0"
+diesel = { version ="2.2.4", features = ["postgres", "chrono"] }
 dotenv = "0.15.0"
+druid = { version =  "0.8.3", features = ["im"] }
+log = "0.4.22"
