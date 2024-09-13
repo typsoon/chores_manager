@@ -8,7 +8,8 @@ use druid::{AppLauncher, PlatformError, WindowDesc};
 use view::window_manager::WindowManager;
 
 fn main() -> Result<(), PlatformError> {
-    let main_window = WindowDesc::new(build_login_screen()).title("Chores Manager");
+    let main_window = WindowDesc::new(build_login_screen())
+        .title("Chores Manager");
 
     AppLauncher::with_window(main_window)
         .delegate(WindowManager::new())

@@ -1,5 +1,9 @@
-use crate::model::types::Credentials;
+use crate::model::types::FullChoreDataRecord;
+use crate::model::types::{ChoresData, Credentials};
+use crate::view::utils::DateUtils;
 use crate::view::view_types::AppState::{LoginState, Main};
+use crate::viewmodel::view_model_traits::ViewModel;
+use chrono::{Local, NaiveDate};
 use dotenv::dotenv;
 use druid::{Data, Lens, Selector};
 use std::env;
@@ -15,30 +19,43 @@ impl AppState {
         LoginState(LoginData::default())
     }
 
-    pub fn move_to_main_state(&mut self) {
-        *self = Main(MainState {});
+    pub fn move_to_main_state(&mut self, viewmodel: &mut Box<dyn ViewModel>) {
+        // *self = Main(MainState { chores_data: Default::default() });
+        let mut main_state = MainState::new(Default::default(), Default::default());
+        main_state.update_chores_data(MonthData::current(), viewmodel);
+        *self = Main(main_state);
     }
 }
-//
-// impl Data for FullChoreDataRecord {
-//     fn same(&self, other: &Self) -> bool {
-//         self.eq(&other)
-//     }
-// }
 
 #[derive(Clone, Default, Data)]
 pub struct MainState {
-
+    #[data(eq)]
+    chores_data: ChoresData,
+    #[data(eq)]
+    month_data: MonthData
 }
 
 impl MainState {
-    // pub fn get_chores_for_day(&self, date: &NaiveDate) -> Vec<ViewFullChoreDataRecord> {
-    //     self.chores.clone().get(date).cloned().unwrap_or_default()
-    // }
-    //
-    // pub fn set_chores(&mut self, chores: HashMap<NaiveDate, Vec<FullChoreDataRecord>>) {
-    //     self.chores = chores.into_iter().map(ViewFullChoreDataRecord::from).collect();
-    // }
+    pub fn get_chores_for_day(&self, date: &NaiveDate) -> Vec<FullChoreDataRecord> {
+        self.chores_data.get(date).cloned().unwrap_or_default()
+    }
+
+    pub fn update_chores_data(&mut self, month_data: MonthData, viewmodel: &mut Box<dyn ViewModel>) {
+        self.month_data = month_data;
+        self.chores_data = viewmodel.get_chores_in_interval(self.month_data.first_day, self.month_data.last_day).unwrap();
+    }
+
+    pub fn chores_data(&self) -> &ChoresData {
+        &self.chores_data
+    }
+
+    pub fn month_data(&self) -> &MonthData {
+        &self.month_data
+    }
+
+    pub fn new(chores_data: ChoresData, month_data: MonthData) -> Self {
+        Self { chores_data, month_data }
+    }
 }
 
 #[derive(Clone, Data, Lens)]
@@ -84,3 +101,19 @@ impl Default for LoginData {
 }
 
 pub const LOG_IN: Selector<()> = Selector::new("log-in");
+
+#[derive(Clone, Default, Debug, PartialEq, Eq, Hash)]
+pub struct MonthData {
+    pub first_day: NaiveDate,
+    pub last_day: NaiveDate,
+}
+
+impl MonthData {
+    pub fn new(first_day: NaiveDate, last_day: NaiveDate) -> Self {
+        Self { first_day, last_day }
+    }
+
+    pub fn current() -> Self {
+        DateUtils::get_month_date_range(Local::now()).unwrap()
+    }
+}

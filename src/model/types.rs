@@ -1,8 +1,10 @@
-use chrono::{Duration, NaiveDateTime};
+use std::collections::HashMap;
+use chrono::{Duration, NaiveDate, NaiveDateTime};
 use diesel::prelude::*;
 use diesel::sql_types::{Interval, Timestamp, VarChar};
 
 pub struct Credentials(pub String, pub String);
+pub type ChoresData = HashMap<NaiveDate, Vec<FullChoreDataRecord>>;
 
 #[allow(dead_code)]
 #[derive(QueryableByName, Clone, Debug, Eq, Hash, PartialEq)]
