@@ -68,3 +68,8 @@ pub struct FullChoreDataRecord {
     #[diesel(sql_type = VarChar)]
     who_updated: String,
 }
+
+#[derive(Debug)]
+pub enum DatabaseError {
+    Error(diesel::result::Error),
+}

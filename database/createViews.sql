@@ -1,3 +1,5 @@
+SET SEARCH_PATH TO chores_manager;
+
 CREATE VIEW chores_manager.PeopleView AS (
     SELECT person_name FROM chores_manager.People
 );
@@ -12,8 +14,10 @@ CREATE VIEW chores_manager.ScheduledChoresView AS (
 );
 
 CREATE VIEW chores_manager.OneTimeChoresView AS (
-    SELECT person_name, chore_name, date_of
-    FROM onetimechores JOIN chores_manager.PeopleChoresPrivateView USING (mapping_id)
+    SELECT person_name, chore_name, onetimechores.date_of, who_updated AS who_updated_id
+    FROM onetimechores
+    JOIN chores_manager.PeopleChoresPrivateView USING (mapping_id)
+    JOIN updates USING (update_id)
 );
 
 CREATE VIEW chores_manager.AllChoresView AS (

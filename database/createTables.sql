@@ -1,5 +1,7 @@
 CREATE SCHEMA chores_manager;
 
+SET SEARCH_PATH TO chores_manager;
+
 CREATE TABLE chores_manager.People (
     person_id SERIAL PRIMARY KEY ,
     person_name VARCHAR UNIQUE NOT NULL
@@ -11,10 +13,14 @@ CREATE TABLE chores_manager.Chores (
     chore_description VARCHAR
 );
 
+CREATE OR REPLACE FUNCTION get_person_id(person_name varchar) RETURNS INTEGER AS
+    $$BEGIN RETURN  (SELECT p.person_id FROM people p WHERE p.person_name = get_person_id.person_name); END$$ LANGUAGE plpgsql;
+
 CREATE TABLE chores_manager.Updates (
     update_id SERIAL PRIMARY KEY ,
-    who_updated INTEGER NOT NULL REFERENCES chores_manager.people ,
-    message VARCHAR
+    who_updated INTEGER NOT NULL REFERENCES chores_manager.people DEFAULT get_person_id(current_user::varchar),
+    message VARCHAR NOT NULL ,
+    date_of TIMESTAMP NOT NULL DEFAULT localtimestamp
 );
 
 CREATE TABLE chores_manager.PeopleChores (

@@ -1,6 +1,6 @@
 use crate::model::traits::DatabaseService;
 use crate::model::traits::ReadOnlyDatabaseService;
-use crate::model::types::{ChoreRecord, FullChoreDataRecord, PersonRecord, ScheduledChoreRecord};
+use crate::model::types::{ChoreRecord, DatabaseError, FullChoreDataRecord, PersonRecord, ScheduledChoreRecord};
 use crate::model::types::{ChoresData, Credentials};
 use chrono::NaiveDate;
 use diesel::r2d2::{ConnectionManager, Error, ManageConnection, Pool};
@@ -42,11 +42,12 @@ pub fn create_psql_database_service(credentials: Credentials) -> Result<Box<dyn 
 }
 
 impl ReadOnlyDatabaseService for PSQLDatabaseService {
-    fn get_chores_in_interval(&self, since: NaiveDate, until: NaiveDate) -> Result<ChoresData, ()> {
+    fn get_chores_in_interval(&self, since: NaiveDate, until: NaiveDate) -> Result<ChoresData, DatabaseError> {
         let fetched_data = sql_query("SELECT * FROM AllChoresView WHERE date_of BETWEEN $1 AND $2")
             .bind::<Date, _>(since)
             .bind::<Date, _>(until)
             .load::<FullChoreDataRecord>(&mut self.connection_pool.get().unwrap());
+
 
         match fetched_data {
             Ok(data) => {
@@ -58,7 +59,7 @@ impl ReadOnlyDatabaseService for PSQLDatabaseService {
                 });
                 Ok(answer)
             }
-            Err(_) => Err(()),
+            Err(er) => Err(DatabaseError::Error(er)),
         }
     }
 }

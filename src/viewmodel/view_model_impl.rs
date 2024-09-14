@@ -1,6 +1,6 @@
 use crate::model::psql_database_service_impl::create_psql_database_service;
 use crate::model::traits::{DatabaseService, ReadOnlyDatabaseService};
-use crate::model::types::{ChoreRecord, ChoresData, Credentials, PersonRecord, ScheduledChoreRecord};
+use crate::model::types::{ChoreRecord, ChoresData, Credentials, DatabaseError, PersonRecord, ScheduledChoreRecord};
 use crate::viewmodel::view_model_traits::ViewModel;
 use chrono::NaiveDate;
 use delegate::delegate;
@@ -20,7 +20,7 @@ impl ReadOnlyDatabaseService for ViewModelImpl {
 
     delegate! {
         to self.database_service {
-           fn get_chores_in_interval(&self, since: NaiveDate, until: NaiveDate) -> Result<ChoresData, ()>;
+           fn get_chores_in_interval(&self, since: NaiveDate, until: NaiveDate) -> Result<ChoresData, DatabaseError>;
         }
     }
 }

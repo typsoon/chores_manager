@@ -2,7 +2,7 @@ use crate::model::types::*;
 use chrono::NaiveDate;
 
 pub trait ReadOnlyDatabaseService {
-    fn get_chores_in_interval(&self, since: NaiveDate, until: NaiveDate) -> Result<ChoresData, ()>;
+    fn get_chores_in_interval(&self, since: NaiveDate, until: NaiveDate) -> Result<ChoresData, DatabaseError>;
 }
 
 pub trait DatabaseService : ReadOnlyDatabaseService {
