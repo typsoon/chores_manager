@@ -4,6 +4,7 @@ use crate::model::types::{ChoreRecord, ChoresData, Credentials, DatabaseError, P
 use crate::viewmodel::view_model_traits::ViewModel;
 use chrono::NaiveDate;
 use delegate::delegate;
+use crate::model::types::ChoreTypeRecord;
 
 struct ViewModelImpl {
     database_service: Box<dyn DatabaseService>,
@@ -17,10 +18,11 @@ pub fn create_view_model(credentials: Credentials) -> Result<Box<dyn ViewModel>,
 }
 
 impl ReadOnlyDatabaseService for ViewModelImpl {
-
     delegate! {
         to self.database_service {
-           fn get_chores_in_interval(&self, since: NaiveDate, until: NaiveDate) -> Result<ChoresData, DatabaseError>;
+            fn get_chores_in_interval(&self, since: NaiveDate, until: NaiveDate) -> Result<ChoresData, DatabaseError>;
+            fn get_people(&self) -> Result<Vec<PersonRecord>, DatabaseError>;
+            fn get_chores(&self) -> Result<Vec<ChoreTypeRecord>, DatabaseError>;
         }
     }
 }

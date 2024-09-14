@@ -11,14 +11,14 @@ CREATE TYPE chores_manager.chore_record AS (
     person_name VARCHAR,
     chore_name VARCHAR,
     date_of TIMESTAMP,
-    who_updated_id INTEGER
+    who_updated VARCHAR
 );
 
 CREATE OR REPLACE FUNCTION chores_manager.genChoresFromScheduled() RETURNS TABLE (
     person_name VARCHAR,
     chore_name VARCHAR,
     date_of TIMESTAMP,
-    who_updated_id INTEGER
+    who_updated VARCHAR
 )
 AS
 $$
@@ -32,13 +32,13 @@ $$
             act_date = scheduled_chore.date_from;
 
             WHILE act_date <= scheduled_chore.date_to LOOP
-                answer := array_append(answer, (scheduled_chore.person_name, scheduled_chore.chore_name, act_date, scheduled_chore.who_updated)::chores_manager.chore_record);
+                answer := array_append(answer, (scheduled_chore.person_name, scheduled_chore.chore_name, act_date, getPersonName(scheduled_chore.who_updated))::chores_manager.chore_record);
                 act_date = act_date + scheduled_chore.interval;
             end loop;
         end loop;
 
         RETURN QUERY
-        SELECT a.person_name, a.chore_name, a.date_of, a.who_updated_id
+        SELECT a.person_name, a.chore_name, a.date_of, a.who_updated
         FROM UNNEST(answer) AS a;
     END;
 $$

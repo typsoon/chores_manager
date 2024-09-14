@@ -6,6 +6,8 @@ my_input_files = [
     "./createPrivateViews.sql",
     "./createFunctions.sql",
     "./createViews.sql",
+    "./createRules.sql",
+    "./createTriggers.sql",
 ]
 
 my_output_file = '../migrations/create_structure/up.sql'

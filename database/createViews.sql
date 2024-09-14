@@ -14,7 +14,7 @@ CREATE VIEW chores_manager.ScheduledChoresView AS (
 );
 
 CREATE VIEW chores_manager.OneTimeChoresView AS (
-    SELECT person_name, chore_name, onetimechores.date_of, who_updated AS who_updated_id
+    SELECT person_name, chore_name, onetimechores.date_of, getPersonName(who_updated) AS who_updated
     FROM onetimechores
     JOIN chores_manager.PeopleChoresPrivateView USING (mapping_id)
     JOIN updates USING (update_id)

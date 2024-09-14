@@ -19,11 +19,17 @@ impl AppState {
         LoginState(LoginData::default())
     }
 
-    pub fn move_to_main_state(&mut self, viewmodel: &mut Box<dyn ViewModel>) {
+    pub fn move_to_main_state(&mut self, viewmodel: &mut Box<dyn ViewModel>) -> &MainState {
         // *self = Main(MainState { chores_data: Default::default() });
         let mut main_state = MainState::new(Default::default(), Default::default());
         main_state.update_chores_data(MonthData::current(), viewmodel);
         *self = Main(main_state);
+        if let Main(main_state) = self {
+            main_state
+        }
+        else {
+            unreachable!()
+        }
     }
 }
 

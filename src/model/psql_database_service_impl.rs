@@ -1,5 +1,6 @@
 use crate::model::traits::DatabaseService;
 use crate::model::traits::ReadOnlyDatabaseService;
+use crate::model::types::ChoreTypeRecord;
 use crate::model::types::{ChoreRecord, DatabaseError, FullChoreDataRecord, PersonRecord, ScheduledChoreRecord};
 use crate::model::types::{ChoresData, Credentials};
 use chrono::NaiveDate;
@@ -48,18 +49,37 @@ impl ReadOnlyDatabaseService for PSQLDatabaseService {
             .bind::<Date, _>(until)
             .load::<FullChoreDataRecord>(&mut self.connection_pool.get().unwrap());
 
-
         match fetched_data {
             Ok(data) => {
                 let mut answer: ChoresData = ChoresData::new();
                 data.iter().for_each(|x| {
-                    answer.entry(x.date_of.date())
+                    answer.entry(x.date_of().date())
                         .or_insert_with(Vec::new)
                         .push(x.clone());
                 });
                 Ok(answer)
             }
             Err(er) => Err(DatabaseError::Error(er)),
+        }
+    }
+
+    fn get_people(&self) -> Result<Vec<PersonRecord>, DatabaseError> {
+        let fetched_data = sql_query("SELECT * FROM PeopleView")
+            .load::<PersonRecord>(&mut self.connection_pool.get().unwrap());
+
+        match fetched_data {
+            Ok(data) => Ok(data),
+            Err(err) => Err(DatabaseError::Error(err)),
+        }
+    }
+
+    fn get_chores(&self) -> Result<Vec<ChoreTypeRecord>, DatabaseError> {
+        let fetched_data = sql_query("SELECT * FROM ChoresView")
+            .load::<ChoreTypeRecord>(&mut self.connection_pool.get().unwrap());
+
+        match fetched_data {
+            Ok(data) => Ok(data),
+            Err(err) => Err(DatabaseError::Error(err)),
         }
     }
 }

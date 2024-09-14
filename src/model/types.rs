@@ -6,14 +6,12 @@ use diesel::sql_types::{Interval, Timestamp, VarChar};
 pub struct Credentials(pub String, pub String);
 pub type ChoresData = HashMap<NaiveDate, Vec<FullChoreDataRecord>>;
 
-#[allow(dead_code)]
 #[derive(QueryableByName, Clone, Debug, Eq, Hash, PartialEq)]
 pub struct PersonRecord {
     #[diesel(sql_type = VarChar)]
     pub person_name: String,
 }
 
-#[allow(dead_code)]
 #[derive(QueryableByName, Debug, Eq, Hash, PartialEq)]
 pub struct ChoreTypeRecord {
     #[diesel(sql_type = VarChar)]
@@ -48,15 +46,6 @@ pub struct ScheduledChoreRecord {
     date_to: NaiveDateTime,
 }
 
-#[allow(dead_code)]
-impl ScheduledChoreRecord {
-    pub fn get_interval(&self) -> Duration {
-        // TODO: make this better
-        // Duration::seconds(self.interval.parse::<i64>().unwrap())
-        self.interval
-    }
-}
-
 #[derive(QueryableByName, Clone, Debug, Eq, Hash, PartialEq)]
 pub struct FullChoreDataRecord {
     #[diesel(sql_type = VarChar)]
@@ -64,9 +53,27 @@ pub struct FullChoreDataRecord {
     #[diesel(sql_type = VarChar)]
     chore_name: String,
     #[diesel(sql_type = Timestamp)]
-    pub date_of: NaiveDateTime,
+    date_of: NaiveDateTime,
     #[diesel(sql_type = VarChar)]
     who_updated: String,
+}
+
+impl FullChoreDataRecord {
+    pub fn person_name(&self) -> &str {
+        &self.person_name
+    }
+
+    pub fn chore_name(&self) -> &str {
+        &self.chore_name
+    }
+
+    pub fn date_of(&self) -> NaiveDateTime {
+        self.date_of
+    }
+
+    pub fn who_updated(&self) -> &str {
+        &self.who_updated
+    }
 }
 
 #[derive(Debug)]

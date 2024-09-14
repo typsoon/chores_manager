@@ -3,6 +3,8 @@ use chrono::NaiveDate;
 
 pub trait ReadOnlyDatabaseService {
     fn get_chores_in_interval(&self, since: NaiveDate, until: NaiveDate) -> Result<ChoresData, DatabaseError>;
+    fn get_people(&self) -> Result<Vec<PersonRecord>, DatabaseError>;
+    fn get_chores(&self) -> Result<Vec<ChoreTypeRecord>, DatabaseError>;
 }
 
 pub trait DatabaseService : ReadOnlyDatabaseService {

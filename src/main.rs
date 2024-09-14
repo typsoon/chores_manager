@@ -12,7 +12,7 @@ fn main() -> Result<(), PlatformError> {
         .title("Chores Manager");
 
     AppLauncher::with_window(main_window)
-        .delegate(WindowManager::new())
+        .delegate(WindowManager {})
         .log_to_console()
         .launch(AppState::new())
 }

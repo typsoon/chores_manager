@@ -1,8 +1,8 @@
-use crate::view::main_ui_elements::calendar_widget::build_calendar_widget;
+use crate::model::types::ChoresData;
+use crate::view::main_ui_elements::main_ui_tabs::build_main_ui_tabs;
 use crate::view::view_types::AppState;
 use crate::viewmodel::view_model_traits::ViewModel;
 use delegate::delegate;
-use druid::widget::Flex;
 use druid::{BoxConstraints, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Size, UpdateCtx, Widget};
 
 struct MainUI {
@@ -40,8 +40,9 @@ impl Widget<AppState> for MainUI {
 }
 
 // pub fn build_main_ui(viewmodel: Box<dyn ViewModel>) -> MainUI {
-pub fn build_main_ui(viewmodel: Box<dyn ViewModel>) -> impl Widget<AppState> {
-    let calendar_widget = build_calendar_widget();
-    let column = Flex::column().with_child(calendar_widget);
-    MainUI::new(viewmodel, Box::new(column))
+pub fn build_main_ui(viewmodel: Box<dyn ViewModel>, chores_data: &ChoresData) -> impl Widget<AppState> {
+    // let calendar_widget = build_calendar_widget(chores_data);
+    let tabs = build_main_ui_tabs(chores_data);
+    // let column = Flex::column().with_flex_spacer(1.).with_child(tabs).with_flex_spacer(1.).center();
+    MainUI::new(viewmodel, Box::new(tabs))
 }

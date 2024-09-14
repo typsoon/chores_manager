@@ -5,22 +5,19 @@ use crate::model::types::Credentials;
 use crate::view::view_types::AppState::LoginState;
 use crate::viewmodel::view_model_impl::create_view_model;
 
-const MAIN_WINDOW_WIDTH: f64 = 1800.0;
-const MAIN_WINDOW_HEIGHT: f64 = 875.0;
+const MAIN_WINDOW_WIDTH: f64 = 1500.0;
+const MAIN_WINDOW_HEIGHT: f64 = 800.0;
 
 pub struct WindowManager {}
 
 impl WindowManager {
-    pub fn new() -> Self {
-        Self {}
-    }
 
     fn try_log_in(credentials: Credentials, delegate_ctx: &mut DelegateCtx, app_state: &mut AppState) -> bool {
         if let Ok(mut viewmodel) = create_view_model(credentials) {
             delegate_ctx.submit_command(druid::commands::CLOSE_ALL_WINDOWS);
 
-            app_state.move_to_main_state(&mut viewmodel);
-            let main_window = WindowDesc::new(build_main_ui(viewmodel))
+            let main_state = app_state.move_to_main_state(&mut viewmodel);
+            let main_window = WindowDesc::new(build_main_ui(viewmodel, main_state.chores_data()))
                 .title("Chores Manager")
                 .window_size((MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT));
 
@@ -32,7 +29,6 @@ impl WindowManager {
         }
     }
 }
-
 
 impl AppDelegate<AppState> for WindowManager {
     fn command(&mut self, ctx: &mut DelegateCtx, _target: Target, cmd: &Command, data: &mut AppState, _env: &Env) -> Handled {
