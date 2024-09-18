@@ -1,17 +1,17 @@
-use crate::model::types::ChoresData;
 use crate::view::main_ui_elements::main_ui_tabs::build_main_ui_tabs;
-use crate::view::view_types::AppState;
+use crate::view::view_types::app_state::AppState;
 use crate::viewmodel::view_model_traits::ViewModel;
 use delegate::delegate;
 use druid::{BoxConstraints, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Size, UpdateCtx, Widget};
+use std::rc::Rc;
 
 struct MainUI {
-    viewmodel: Box<dyn ViewModel>,
+    viewmodel: Rc<dyn ViewModel>,
     widget: Box<dyn Widget<AppState>>,
 }
 
 impl MainUI {
-    fn new(viewmodel: Box<dyn ViewModel>, widget: Box<dyn Widget<AppState>>) -> Self {
+    fn new(viewmodel: Rc<dyn ViewModel>, widget: Box<dyn Widget<AppState>>) -> Self {
         Self { viewmodel, widget }
     }
 }
@@ -40,9 +40,10 @@ impl Widget<AppState> for MainUI {
 }
 
 // pub fn build_main_ui(viewmodel: Box<dyn ViewModel>) -> MainUI {
-pub fn build_main_ui(viewmodel: Box<dyn ViewModel>, chores_data: &ChoresData) -> impl Widget<AppState> {
+pub fn build_main_ui(viewmodel: impl ViewModel+'static) -> impl Widget<AppState> {
     // let calendar_widget = build_calendar_widget(chores_data);
-    let tabs = build_main_ui_tabs(chores_data);
+    let viewmodel_rc = Rc::new(viewmodel);
+    let tabs = build_main_ui_tabs(viewmodel_rc.clone());
     // let column = Flex::column().with_flex_spacer(1.).with_child(tabs).with_flex_spacer(1.).center();
-    MainUI::new(viewmodel, Box::new(tabs))
+    MainUI::new(viewmodel_rc, Box::new(tabs))
 }

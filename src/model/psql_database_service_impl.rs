@@ -37,7 +37,7 @@ fn establish_connection(credentials: Credentials) ->  Result<Pool<ConnectionMana
 
 pub fn create_psql_database_service(credentials: Credentials) -> Result<Box<dyn DatabaseService>, ()> {
     match establish_connection(credentials) {
-        Ok(connection_pool) => Ok(Box::new(PSQLDatabaseService { connection_pool: connection_pool })),
+        Ok(connection_pool) => Ok(Box::new(PSQLDatabaseService { connection_pool })),
         Err(_) => Err(()),
     }
 }

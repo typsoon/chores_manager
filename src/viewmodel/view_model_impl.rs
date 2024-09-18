@@ -10,9 +10,9 @@ struct ViewModelImpl {
     database_service: Box<dyn DatabaseService>,
 }
 
-pub fn create_view_model(credentials: Credentials) -> Result<Box<dyn ViewModel>, ()> {
+pub fn create_view_model(credentials: Credentials) -> Result<impl ViewModel+'static, ()> {
     match create_psql_database_service(credentials) {
-        Ok(database_service) => Ok(Box::new(ViewModelImpl { database_service }) as Box<dyn ViewModel>,),
+        Ok(database_service) => Ok(ViewModelImpl { database_service }),
         Err(_) => Err(()),
     }
 }

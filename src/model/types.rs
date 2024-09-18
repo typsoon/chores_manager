@@ -12,12 +12,12 @@ pub struct PersonRecord {
     pub person_name: String,
 }
 
-#[derive(QueryableByName, Debug, Eq, Hash, PartialEq)]
+#[derive(QueryableByName, Debug, Eq, Hash, PartialEq, Clone)]
 pub struct ChoreTypeRecord {
     #[diesel(sql_type = VarChar)]
-    chore_name: String,
+    pub chore_name: String,
     #[diesel(sql_type = VarChar)]
-    chore_description: String,
+    pub chore_description: String,
 }
 
 #[allow(dead_code)]

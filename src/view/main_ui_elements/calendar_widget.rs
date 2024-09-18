@@ -1,12 +1,14 @@
-use crate::model::types::{ChoresData, FullChoreDataRecord};
-use crate::view::utils::DateUtils;
-use crate::view::view_types::AppState;
-use crate::view::view_types::MonthData;
+use crate::model::traits::ReadOnlyDatabaseService;
+use crate::model::types::FullChoreDataRecord;
+use crate::view::view_types::utils::DateUtils;
+use crate::view::view_types::app_state::AppState;
+use crate::view::view_types::utils::MonthData;
 use chrono::{Datelike, NaiveDate, Weekday};
 use delegate::delegate;
 use druid::widget::{Align, Container, Flex, Label, Padding};
 use druid::{BoxConstraints, Color, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Size, UpdateCtx, Widget, WidgetExt};
 use std::mem;
+use std::rc::Rc;
 
 const CELL_WIDTH: f64 = 200.0;
 const CELL_HEIGHT: f64 = 60.0;
@@ -17,6 +19,7 @@ const DAY_WIDGET_ITEM_WIDTH: f64 = DAY_WIDGET_WIDTH - 15.0;
 const DAY_WIDGET_ITEM_HEIGHT: f64 = 50.0;
 
 pub struct CalendarWidget {
+    read_only_database_service: Rc<dyn ReadOnlyDatabaseService>,
     widget: Flex<AppState>,
 }
 
@@ -25,13 +28,15 @@ impl CalendarWidget {
     //     Self { widget, viewmodel }
     // }
 
-    pub fn new(widget: Flex<AppState>, chores_data: &ChoresData) -> Self {
-        let mut answer = Self { widget };
-        answer.create_day_widgets(MonthData::current(), chores_data);
+    pub fn new(widget: Flex<AppState>, read_only_database_service: Rc<dyn ReadOnlyDatabaseService>) -> Self {
+        let mut answer = Self { widget, read_only_database_service };
+        answer.create_day_widgets(MonthData::current());
         answer
     }
 
-    fn create_day_widgets(&mut self, month_data: MonthData, chores_data: &ChoresData) {
+    fn create_day_widgets(&mut self, month_data: MonthData) {
+        let chores_data = self.read_only_database_service.get_chores_in_interval(month_data.first_day, month_data.last_day).unwrap();
+
         let current_month_tiles_color = Color::rgb(0.7, 0.9, 1.0);
         let other_tiles_color = Color::rgb(0.8, 0.8, 0.8);
         let get_right_color = |day: &NaiveDate| {
@@ -114,7 +119,7 @@ impl Widget<AppState> for DayWidget {
 }
 
 // pub fn build_calendar_widget(chores_data: &ChoresData, month_data: MonthData, viewmodel: Box<dyn ViewModel>) -> impl Widget<AppState> {
-pub fn build_calendar_widget(chores_data: &ChoresData) -> impl Widget<AppState> {
+pub fn build_calendar_widget(read_only_database_service: Rc<dyn ReadOnlyDatabaseService>) -> impl Widget<AppState> {
     let make_label = |label_name| {
         let label =  Label::new(label_name)
             .with_text_size(FONT_SIZE)
@@ -138,5 +143,5 @@ pub fn build_calendar_widget(chores_data: &ChoresData) -> impl Widget<AppState> 
     );
 
     // CalendarWidget::new(Box::new(widget), viewmodel)
-    CalendarWidget::new(widget, chores_data)
+    CalendarWidget::new(widget, read_only_database_service)
 }

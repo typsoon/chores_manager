@@ -1,6 +1,4 @@
-use chrono::{Datelike, Days, Months, NaiveDate, Weekday};
-use crate::view::view_types::MonthData;
-
+use chrono::{Datelike, Days, Local, Months, NaiveDate, Weekday};
 pub struct DateUtils;
 
 impl DateUtils {
@@ -35,5 +33,21 @@ impl DateUtils {
             answer.push(d);
         }
         answer
+    }
+}
+
+#[derive(Clone, Default, Debug, PartialEq, Eq, Hash)]
+pub struct MonthData {
+    pub first_day: NaiveDate,
+    pub last_day: NaiveDate,
+}
+
+impl MonthData {
+    pub fn new(first_day: NaiveDate, last_day: NaiveDate) -> Self {
+        Self { first_day, last_day }
+    }
+
+    pub fn current() -> Self {
+        DateUtils::get_month_date_range(Local::now()).unwrap()
     }
 }

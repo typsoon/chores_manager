@@ -3,7 +3,7 @@ mod view;
 mod viewmodel;
 
 use crate::view::login_screen::build_login_screen;
-use crate::view::view_types::AppState;
+use view::view_types::app_state::AppState;
 use druid::{AppLauncher, PlatformError, WindowDesc};
 use view::window_manager::WindowManager;
 
