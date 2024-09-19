@@ -1,7 +1,7 @@
 use crate::model::traits::ReadOnlyDatabaseService;
 use crate::model::types::FullChoreDataRecord;
+use crate::view::view_types::app_state::DatabaseData;
 use crate::view::view_types::utils::DateUtils;
-use crate::view::view_types::app_state::AppState;
 use crate::view::view_types::utils::MonthData;
 use chrono::{Datelike, NaiveDate, Weekday};
 use delegate::delegate;
@@ -20,7 +20,7 @@ const DAY_WIDGET_ITEM_HEIGHT: f64 = 50.0;
 
 pub struct CalendarWidget {
     read_only_database_service: Rc<dyn ReadOnlyDatabaseService>,
-    widget: Flex<AppState>,
+    widget: Flex<DatabaseData>,
 }
 
 impl CalendarWidget {
@@ -28,7 +28,7 @@ impl CalendarWidget {
     //     Self { widget, viewmodel }
     // }
 
-    pub fn new(widget: Flex<AppState>, read_only_database_service: Rc<dyn ReadOnlyDatabaseService>) -> Self {
+    pub fn new(widget: Flex<DatabaseData>, read_only_database_service: Rc<dyn ReadOnlyDatabaseService>) -> Self {
         let mut answer = Self { widget, read_only_database_service };
         answer.create_day_widgets(MonthData::current());
         answer
@@ -60,14 +60,16 @@ impl CalendarWidget {
     }
 }
 
-impl Widget<AppState> for CalendarWidget {
+impl Widget<DatabaseData> for CalendarWidget {
     delegate!{
         to self.widget {
-            fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, env: &Env);
-            fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &AppState, env: &Env);
-            fn update(&mut self, ctx: &mut UpdateCtx, old_data: &AppState, data: &AppState, env: &Env);
-            fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &AppState, env: &Env) -> Size;
-            fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, env: &Env);
+            fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut DatabaseData, env: &Env);
+            fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &DatabaseData, env: &Env);
+
+            fn update(&mut self, ctx: &mut UpdateCtx, old_data: &DatabaseData, data: &DatabaseData, env: &Env);
+
+            fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &DatabaseData, env: &Env) -> Size;
+            fn paint(&mut self, ctx: &mut PaintCtx, data: &DatabaseData, env: &Env);
         }
     }
 }
@@ -75,7 +77,7 @@ impl Widget<AppState> for CalendarWidget {
 pub struct DayWidget {
     date: NaiveDate,
     chores: Vec<FullChoreDataRecord>,
-    column: Flex<AppState>,
+    column: Flex<DatabaseData>,
 }
 
 impl DayWidget {
@@ -106,20 +108,22 @@ impl DayWidget {
     }
 }
 
-impl Widget<AppState> for DayWidget {
+impl Widget<DatabaseData> for DayWidget {
     delegate!{
         to self.column {
-            fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &AppState, env: &Env) -> Size;
-            fn update(&mut self, ctx: &mut UpdateCtx, old_data: &AppState, data: &AppState, env: &Env);
-            fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, env: &Env);
-            fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &AppState, env: &Env);
-            fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, env: &Env);
+            fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut DatabaseData, env: &Env);
+            fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &DatabaseData, env: &Env);
+
+            fn update(&mut self, ctx: &mut UpdateCtx, old_data: &DatabaseData, data: &DatabaseData, env: &Env);
+
+            fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &DatabaseData, env: &Env) -> Size;
+            fn paint(&mut self, ctx: &mut PaintCtx, data: &DatabaseData, env: &Env);
         }
     }
 }
 
 // pub fn build_calendar_widget(chores_data: &ChoresData, month_data: MonthData, viewmodel: Box<dyn ViewModel>) -> impl Widget<AppState> {
-pub fn build_calendar_widget(read_only_database_service: Rc<dyn ReadOnlyDatabaseService>) -> impl Widget<AppState> {
+pub fn build_calendar_widget(read_only_database_service: Rc<dyn ReadOnlyDatabaseService>) -> impl Widget<DatabaseData> {
     let make_label = |label_name| {
         let label =  Label::new(label_name)
             .with_text_size(FONT_SIZE)

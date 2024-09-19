@@ -1,77 +1,47 @@
+use std::default::Default;
 use druid::{Data, Lens};
 use crate::model::types::{ChoresData, Credentials};
-use druid::im::Vector;
+use druid::im::{Vector};
 use std::env;
-use crate::model::traits::ReadOnlyDatabaseService;
+use std::rc::Rc;
+use crate::view::view_types::app_state::AppState::{LoginState, MainState};
 use crate::viewmodel::view_model_traits::ViewModel;
 use crate::view::view_types::utils::MonthData;
 use crate::view::view_types::wrappers::{ChoreTypeRecordWrapper, PersonRecordWrapper};
 
-#[derive(Clone, Default, Data, Lens)]
-pub struct AppState {
-    login_data: Option<LoginData>,
-    #[data(eq)]
-    chores_data: ChoresData,
-    #[data(eq)]
-    month_data: MonthData,
-    people: Vector<PersonRecordWrapper>,
-    chores: Vector<ChoreTypeRecordWrapper>
-    // main_state: MainState
+#[derive(Clone, Data)]
+pub enum AppState {
+    LoginState(LoginData),
+    MainState(MainStateData)
 }
 
 impl AppState {
     pub fn new() -> Self {
-        let mut answer = Self::default();
-        answer.login_data = Some(LoginData::default());
-        answer
+        LoginState(LoginData::default())
     }
 
-    pub fn update_data(&mut self, month_data: MonthData, viewmodel: &mut dyn ViewModel) {
-        self.month_data = month_data;
-        self.chores_data = viewmodel.get_chores_in_interval(self.month_data.first_day, self.month_data.last_day).unwrap();
-        self.people = viewmodel.get_people().unwrap().into_iter()
-            .map(|x| PersonRecordWrapper::new(x))
-            .collect();
-
-        self.chores = viewmodel.get_chores().unwrap().into_iter()
-            .map(|x| {ChoreTypeRecordWrapper::new(x)})
-            .collect();
-        // self.main_state.update_chores_data(MonthData::current(), viewmodel);
-    }
-
-    pub fn move_to_main_state(&mut self, viewmodel: &mut dyn ViewModel){
+    pub fn move_to_main_state(&mut self, viewmodel: Rc<impl ViewModel+'static>){
         // *self = Main(MainState { chores_data: Default::default() });
-        self.login_data = None;
-        self.update_data(MonthData::current(), viewmodel);
+        let mut database_data = DatabaseData::new(viewmodel);
+        database_data.update_data(MonthData::current());
+        *self = MainState(MainStateData { database_data, input_data: Default::default() });
     }
 
-    pub fn get_login_data(&self) -> &Option<LoginData> {
-        &self.login_data
+    // TODO: try to remove this method
+    pub fn get_login_data(&self) -> &LoginData {
+        if let LoginState(ref login_data) = self {
+            login_data
+        }
+        else {
+            unreachable!("You shouldn't be calling this function when not in login state");
+        }
     }
 }
 
-pub struct LoginLens;
-
-impl Lens<AppState, LoginData> for LoginLens {
-    fn with<V, F: FnOnce(&LoginData) -> V>(&self, data: &AppState, f: F) -> V {
-        if let Some(ref login_data) = data.login_data {
-            f(login_data)
-        } else {
-            log::info!("Appstate is not in the Login variant at function with");
-            f(&LoginData::default())
-            // unreachable!("AppState is not in the Login variant")
-        }
-    }
-
-    fn with_mut<V, F: FnOnce(&mut LoginData) -> V>(&self, data: &mut AppState, f: F) -> V {
-        if let Some(ref mut login_data) = data.login_data {
-            f(login_data)
-        } else {
-            log::info!("Appstate is not in the Login variant at function with_mut");
-            f(&mut LoginData::default())
-            // unreachable!("AppState is not in the Login variant")
-        }
-    }
+#[derive(Clone, Data, Lens)]
+pub struct MainStateData {
+    database_data: DatabaseData,
+    input_data: MainStateInputData
 }
 
 #[derive(Clone, Data, Lens)]
@@ -116,37 +86,86 @@ impl Default for LoginData {
     }
 }
 
-// #[derive(Clone, Default, Data)]
-// pub struct MainState {
-//     #[data(eq)]
-//     chores_data: ChoresData,
-//     #[data(eq)]
-//     month_data: MonthData,
-//     #[data(eq)]
-//     people: Vec<PersonRecord>,
-//     #[data(eq)]
-//     chores: Vec<ChoreRecord>
-// }
+#[derive(Clone, Data, Lens)]
+pub struct DatabaseData {
+    #[data(ignore)]
+    #[lens(ignore)]
+    viewmodel: Rc<dyn ViewModel>,
+    #[data(eq)]
+    chores_data: ChoresData,
+    #[data(eq)]
+    month_data: MonthData,
+    people: Vector<PersonRecordWrapper>,
+    chores: Vector<ChoreTypeRecordWrapper>
+}
 
-// impl MainState {
-//     // pub fn get_chores_for_day(&self, date: &NaiveDate) -> Vec<FullChoreDataRecord> {
-//     //     self.chores_data.get(date).cloned().unwrap_or_default()
-//     // }
-//
-//     pub fn update_chores_data(&mut self, month_data: MonthData, viewmodel: &mut dyn ViewModel) {
-//         self.month_data = month_data;
-//         self.chores_data = viewmodel.get_chores_in_interval(self.month_data.first_day, self.month_data.last_day).unwrap();
-//     }
-//
-//     // pub fn chores_data(&self) -> &ChoresData {
-//     //     &self.chores_data
-//     // }
-//     //
-//     // pub fn month_data(&self) -> &MonthData {
-//     //     &self.month_data
-//     // }
-//
-//     pub fn new(chores_data: ChoresData, month_data: MonthData, people: Vec<PersonRecord>, chores: Vec<ChoreRecord>) -> Self {
-//         Self { chores_data, month_data, people, chores }
-//     }
-// }
+impl DatabaseData {
+    fn update_data(&mut self, month_data: MonthData) {
+        self.month_data = month_data;
+        self.chores_data = self.viewmodel.get_chores_in_interval(self.month_data.first_day, self.month_data.last_day).unwrap();
+        self.people = self.viewmodel.get_people().unwrap().into_iter()
+            .map(|x| PersonRecordWrapper::new(x))
+            .collect();
+
+        self.chores = self.viewmodel.get_chores().unwrap().into_iter()
+            .map(|x| {ChoreTypeRecordWrapper::new(x)})
+            .collect();
+        // self.main_state.update_chores_data(MonthData::current(), viewmodel);
+    }
+
+    pub fn new(viewmodel: Rc<dyn ViewModel>) -> Self {
+        Self { viewmodel, chores_data: Default::default(), month_data: Default::default(), people: Default::default(), chores: Default::default() }
+    }
+}
+
+#[derive(Clone, Data, Lens, Default)]
+pub struct MainStateInputData {
+    added_person_name: String,
+    added_chore_type_name: String
+}
+
+pub struct LoginDataLens;
+
+impl Lens<AppState, LoginData> for LoginDataLens {
+    fn with<V, F: FnOnce(&LoginData) -> V>(&self, data: &AppState, f: F) -> V {
+        if let LoginState(ref login_data) = data {
+            f(login_data)
+        } else {
+            log::info!("Appstate is not in the Login variant at function with");
+            f(&Default::default())
+            // unreachable!("AppState is not in the Login variant")
+        }
+    }
+
+    fn with_mut<V, F: FnOnce(&mut LoginData) -> V>(&self, data: &mut AppState, f: F) -> V {
+        if let LoginState(ref mut login_data) = data {
+            f(login_data)
+        } else {
+            log::info!("Appstate is not in the Login variant at function with_mut");
+            f(&mut Default::default())
+            // unreachable!("AppState is not in the Login variant")
+        }
+    }
+}
+
+pub struct MainStateLens;
+
+impl Lens<AppState, MainStateData> for MainStateLens {
+    fn with<V, F: FnOnce(&MainStateData) -> V>(&self, data: &AppState, f: F) -> V {
+        if let MainState(ref main_state_data) = data {
+            f(main_state_data)
+        }
+        else {
+            unreachable!("AppState not in main state")
+        }
+    }
+
+    fn with_mut<V, F: FnOnce(&mut MainStateData) -> V>(&self, data: &mut AppState, f: F) -> V {
+        if let MainState(ref mut main_state_data) = data {
+            f(main_state_data)
+        }
+        else {
+            unreachable!("AppState not in main state")
+        }
+    }
+}

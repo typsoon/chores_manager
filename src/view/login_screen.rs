@@ -1,8 +1,8 @@
+use crate::view::view_types::app_state::LoginData;
 use crate::view::view_types::selectors::LOG_IN;
 use delegate::delegate;
 use druid::widget::{Button, Checkbox, Flex, TextBox};
 use druid::{BoxConstraints, Env, Event, EventCtx, FontDescriptor, FontFamily, FontWeight, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Size, UnitPoint, UpdateCtx, Widget, WidgetExt};
-use crate::view::view_types::app_state::{AppState, LoginData, LoginLens};
 
 struct LoginLayoutConfig;
 
@@ -13,17 +13,17 @@ impl LoginLayoutConfig {
 }
 
 pub struct LoginScreen {
-    widget: Box<dyn Widget<AppState>>,
+    widget: Box<dyn Widget<LoginData>>,
 }
 
 impl LoginScreen {
-    fn new(widget: Box<dyn Widget<AppState>>) -> Self {
+    fn new(widget: Box<dyn Widget<LoginData>>) -> Self {
         Self { widget }
     }
 }
 
-impl Widget<AppState> for LoginScreen {
-    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &AppState, env: &Env) {
+impl Widget<LoginData> for LoginScreen {
+    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &LoginData, env: &Env) {
         if let LifeCycle::WidgetAdded = event {
             ctx.submit_command(LOG_IN);
         }
@@ -32,15 +32,15 @@ impl Widget<AppState> for LoginScreen {
 
     delegate! {
         to self.widget {
-            fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut AppState, env: &Env);
-            fn update(&mut self, ctx: &mut UpdateCtx, old_data: &AppState, data: &AppState, env: &Env);
-            fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &AppState, env: &Env) -> Size;
-            fn paint(&mut self, ctx: &mut PaintCtx, data: &AppState, env: &Env);
+            fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut LoginData, env: &Env);
+            fn update(&mut self, ctx: &mut UpdateCtx, old_data: &LoginData, data: &LoginData, env: &Env);
+            fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &LoginData, env: &Env) -> Size;
+            fn paint(&mut self, ctx: &mut PaintCtx, data: &LoginData, env: &Env);
         }
     }
 }
 
-pub fn build_login_screen() -> impl Widget<AppState> {
+pub fn build_login_screen() -> impl Widget<LoginData> {
     // let title_font = FontDescriptor::new(FontFamily::SYSTEM_UI)
     //     .with_weight(FontWeight::BOLD)
     //     .with_size(40.0);
@@ -88,6 +88,6 @@ pub fn build_login_screen() -> impl Widget<AppState> {
         .with_spacer(LoginLayoutConfig::VERTICAL_WIDGET_SPACING)
         .with_child(log_in_button)
         .with_spacer(LoginLayoutConfig::VERTICAL_WIDGET_SPACING)
-        .lens(LoginLens)))
+        ))
         .align_vertical(UnitPoint::CENTER)
 }
