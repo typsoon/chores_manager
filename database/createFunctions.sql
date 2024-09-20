@@ -7,18 +7,34 @@ CREATE OR REPLACE FUNCTION getPersonName(person_id INT) RETURNS VARCHAR AS
         END;
     $$ LANGUAGE plpgsql;
 
+
+CREATE OR REPLACE FUNCTION wasCompleted(time_slot_id INTEGER, iteration INTEGER) RETURNS BOOLEAN AS
+    $$
+    BEGIN
+        IF EXISTS (SELECT * FROM completedchores cc WHERE cc.time_slot_id = wasCompleted.time_slot_id AND cc.iteration = wasCompleted.iteration) THEN
+            RETURN TRUE;
+        ELSE
+            RETURN FALSE;
+        END IF;
+    END;
+    $$ LANGUAGE plpgsql;
+
 CREATE TYPE chores_manager.chore_record AS (
     person_name VARCHAR,
     chore_name VARCHAR,
     date_of TIMESTAMP,
-    who_updated VARCHAR
+    who_updated VARCHAR,
+    iteration INTEGER,
+    was_completed BOOLEAN
 );
 
 CREATE OR REPLACE FUNCTION chores_manager.genChoresFromScheduled() RETURNS TABLE (
     person_name VARCHAR,
     chore_name VARCHAR,
     date_of TIMESTAMP,
-    who_updated VARCHAR
+    who_updated VARCHAR,
+    iteration INTEGER,
+    was_completed BOOLEAN
 )
 AS
 $$
@@ -26,19 +42,27 @@ $$
         scheduled_chore record;
         answer chores_manager.chore_record[];
         act_date TIMESTAMP;
+        iteration INTEGER;
     BEGIN
-        FOR scheduled_chore IN SELECT * FROM scheduledchores JOIN peoplechoresprivateview USING (mapping_id) JOIN updates USING (update_id)
+        FOR scheduled_chore IN SELECT * FROM scheduledchores JOIN peoplechoresprivateview USING (mapping_id) JOIN scheduleupdates USING (time_slot_id)
             LOOP
             act_date = scheduled_chore.date_from;
 
+            iteration = 1;
             WHILE act_date <= scheduled_chore.date_to LOOP
-                answer := array_append(answer, (scheduled_chore.person_name, scheduled_chore.chore_name, act_date, getPersonName(scheduled_chore.who_updated))::chores_manager.chore_record);
-                act_date = act_date + scheduled_chore.interval;
+                answer := array_append(
+                        answer, (
+                                 scheduled_chore.person_name, scheduled_chore.chore_name,
+                                 act_date, getPersonName(scheduled_chore.who_updated),
+                                 iteration,
+                                 wasCompleted(scheduled_chore.time_slot_id, iteration))::chores_manager.chore_record);
+                act_date := act_date + scheduled_chore.interval;
+                iteration := iteration+1;
             end loop;
         end loop;
 
         RETURN QUERY
-        SELECT a.person_name, a.chore_name, a.date_of, a.who_updated
+        SELECT a.person_name, a.chore_name, a.date_of, a.who_updated, a.iteration, a.was_completed
         FROM UNNEST(answer) AS a;
     END;
 $$

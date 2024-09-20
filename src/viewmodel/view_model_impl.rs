@@ -1,16 +1,18 @@
 use crate::model::psql_database_service_impl::create_psql_database_service;
 use crate::model::traits::{DatabaseService, ReadOnlyDatabaseService};
-use crate::model::types::{ChoreRecord, ChoresData, Credentials, DatabaseError, PersonRecord, ScheduledChoreRecord};
+use crate::model::types::ChoreTypeRecord;
+use crate::model::types::{
+    ChoreRecord, ChoresData, Credentials, DatabaseError, PersonRecord, ScheduledChoreRecord,
+};
 use crate::viewmodel::view_model_traits::ViewModel;
 use chrono::NaiveDate;
 use delegate::delegate;
-use crate::model::types::ChoreTypeRecord;
 
 struct ViewModelImpl {
     database_service: Box<dyn DatabaseService>,
 }
 
-pub fn create_view_model(credentials: Credentials) -> Result<impl ViewModel+'static, ()> {
+pub fn create_view_model(credentials: Credentials) -> Result<impl ViewModel + 'static, ()> {
     match create_psql_database_service(credentials) {
         Ok(database_service) => Ok(ViewModelImpl { database_service }),
         Err(_) => Err(()),

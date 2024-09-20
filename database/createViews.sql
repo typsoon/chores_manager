@@ -14,10 +14,10 @@ CREATE VIEW chores_manager.ScheduledChoresView AS (
 );
 
 CREATE VIEW chores_manager.OneTimeChoresView AS (
-    SELECT person_name, chore_name, onetimechores.date_of, getPersonName(who_updated) AS who_updated
+    SELECT person_name, chore_name, onetimechores.date_of, getPersonName(who_updated) AS who_updated, 1 AS iteration, wasCompleted(time_slot_id, 1) AS was_completed
     FROM onetimechores
     JOIN chores_manager.PeopleChoresPrivateView USING (mapping_id)
-    JOIN updates USING (update_id)
+    JOIN scheduleupdates USING (time_slot_id)
 );
 
 CREATE VIEW chores_manager.AllChoresView AS (

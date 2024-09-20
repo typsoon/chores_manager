@@ -1,4 +1,3 @@
 // @generated automatically by Diesel CLI.
 
-pub mod chores_manager {
-}
+pub mod chores_manager {}

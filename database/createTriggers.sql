@@ -4,7 +4,7 @@ CREATE OR REPLACE FUNCTION insertOneTimeChores() RETURNS TRIGGER
 AS
 $$
     DECLARE
-        func_update_id INTEGER;
+        func_time_slot_id INTEGER;
         person_and_chore RECORD;
         func_message VARCHAR;
     BEGIN
@@ -21,11 +21,11 @@ $$
                        || ', chore_name = '
                        || person_and_chore.chore_name;
 
-        INSERT INTO updates(message)
+        INSERT INTO scheduleupdates(message)
         VALUES(func_message)
-        RETURNING update_id INTO func_update_id;
+        RETURNING time_slot_id INTO func_time_slot_id;
 
-        new.update_id = func_update_id;
+        new.time_slot_id = func_time_slot_id;
         RETURN new;
     END
 $$

@@ -2,7 +2,10 @@ use crate::view::main_ui_elements::main_ui_tabs::build_main_ui_tabs;
 use crate::view::view_types::app_state::MainStateData;
 use crate::viewmodel::view_model_traits::ViewModel;
 use delegate::delegate;
-use druid::{BoxConstraints, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Size, UpdateCtx, Widget};
+use druid::{
+    BoxConstraints, Env, Event, EventCtx, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Size,
+    UpdateCtx, Widget,
+};
 use std::rc::Rc;
 
 struct MainUI {
@@ -17,7 +20,6 @@ impl MainUI {
 }
 
 impl Widget<MainStateData> for MainUI {
-
     delegate! {
         to self.widget {
             fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut MainStateData, env: &Env);
@@ -34,7 +36,7 @@ impl Widget<MainStateData> for MainUI {
 }
 
 // pub fn build_main_ui(viewmodel: Box<dyn ViewModel>) -> MainUI {
-pub fn build_main_ui(viewmodel: Rc<impl ViewModel+'static>) -> impl Widget<MainStateData> {
+pub fn build_main_ui(viewmodel: Rc<impl ViewModel + 'static>) -> impl Widget<MainStateData> {
     // let calendar_widget = build_calendar_widget(chores_data);
     let tabs = build_main_ui_tabs(viewmodel.clone());
     // let column = Flex::column().with_flex_spacer(1.).with_child(tabs).with_flex_spacer(1.).center();

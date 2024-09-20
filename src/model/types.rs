@@ -1,7 +1,7 @@
-use std::collections::HashMap;
 use chrono::{Duration, NaiveDate, NaiveDateTime};
 use diesel::prelude::*;
-use diesel::sql_types::{Interval, Timestamp, VarChar};
+use diesel::sql_types::{Bool, Integer, Interval, Timestamp, VarChar};
+use std::collections::HashMap;
 
 pub struct Credentials(pub String, pub String);
 pub type ChoresData = HashMap<NaiveDate, Vec<FullChoreDataRecord>>;
@@ -28,7 +28,7 @@ pub struct ChoreRecord {
     #[diesel(sql_type = VarChar)]
     chore_name: String,
     #[diesel(sql_type = Timestamp)]
-    date_of: NaiveDateTime
+    date_of: NaiveDateTime,
 }
 
 #[allow(dead_code)]
@@ -56,6 +56,10 @@ pub struct FullChoreDataRecord {
     date_of: NaiveDateTime,
     #[diesel(sql_type = VarChar)]
     who_updated: String,
+    #[diesel(sql_type = Integer)]
+    iteration: i32,
+    #[diesel(sql_type = Bool)]
+    was_completed: bool,
 }
 
 impl FullChoreDataRecord {

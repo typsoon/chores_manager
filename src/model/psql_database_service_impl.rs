@@ -1,7 +1,9 @@
 use crate::model::traits::DatabaseService;
 use crate::model::traits::ReadOnlyDatabaseService;
 use crate::model::types::ChoreTypeRecord;
-use crate::model::types::{ChoreRecord, DatabaseError, FullChoreDataRecord, PersonRecord, ScheduledChoreRecord};
+use crate::model::types::{
+    ChoreRecord, DatabaseError, FullChoreDataRecord, PersonRecord, ScheduledChoreRecord,
+};
 use crate::model::types::{ChoresData, Credentials};
 use chrono::NaiveDate;
 use diesel::r2d2::{ConnectionManager, Error, ManageConnection, Pool};
@@ -15,7 +17,9 @@ struct PSQLDatabaseService {
     connection_pool: Pool<ConnectionManager<PgConnection>>,
 }
 
-fn establish_connection(credentials: Credentials) ->  Result<Pool<ConnectionManager<PgConnection>>, Error> {
+fn establish_connection(
+    credentials: Credentials,
+) -> Result<Pool<ConnectionManager<PgConnection>>, Error> {
     dotenv().ok();
 
     let host = env::var("HOST").expect("HOST must be set");
@@ -35,7 +39,9 @@ fn establish_connection(credentials: Credentials) ->  Result<Pool<ConnectionMana
     // PgConnection::establish(&database_url)
 }
 
-pub fn create_psql_database_service(credentials: Credentials) -> Result<Box<dyn DatabaseService>, ()> {
+pub fn create_psql_database_service(
+    credentials: Credentials,
+) -> Result<Box<dyn DatabaseService>, ()> {
     match establish_connection(credentials) {
         Ok(connection_pool) => Ok(Box::new(PSQLDatabaseService { connection_pool })),
         Err(_) => Err(()),
@@ -43,7 +49,11 @@ pub fn create_psql_database_service(credentials: Credentials) -> Result<Box<dyn 
 }
 
 impl ReadOnlyDatabaseService for PSQLDatabaseService {
-    fn get_chores_in_interval(&self, since: NaiveDate, until: NaiveDate) -> Result<ChoresData, DatabaseError> {
+    fn get_chores_in_interval(
+        &self,
+        since: NaiveDate,
+        until: NaiveDate,
+    ) -> Result<ChoresData, DatabaseError> {
         let fetched_data = sql_query("SELECT * FROM AllChoresView WHERE date_of BETWEEN $1 AND $2")
             .bind::<Date, _>(since)
             .bind::<Date, _>(until)
@@ -53,8 +63,9 @@ impl ReadOnlyDatabaseService for PSQLDatabaseService {
             Ok(data) => {
                 let mut answer: ChoresData = ChoresData::new();
                 data.iter().for_each(|x| {
-                    answer.entry(x.date_of().date())
-                        .or_insert_with(Vec::new)
+                    answer
+                        .entry(x.date_of().date())
+                        .or_default()
                         .push(x.clone());
                 });
                 Ok(answer)

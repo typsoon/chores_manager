@@ -2,7 +2,10 @@ use crate::view::view_types::app_state::LoginData;
 use crate::view::view_types::selectors::LOG_IN;
 use delegate::delegate;
 use druid::widget::{Button, Checkbox, Flex, TextBox};
-use druid::{BoxConstraints, Env, Event, EventCtx, FontDescriptor, FontFamily, FontWeight, LayoutCtx, LifeCycle, LifeCycleCtx, PaintCtx, Size, UnitPoint, UpdateCtx, Widget, WidgetExt};
+use druid::{
+    BoxConstraints, Env, Event, EventCtx, FontDescriptor, FontFamily, FontWeight, LayoutCtx,
+    LifeCycle, LifeCycleCtx, PaintCtx, Size, UnitPoint, UpdateCtx, Widget, WidgetExt,
+};
 
 struct LoginLayoutConfig;
 
@@ -23,7 +26,13 @@ impl LoginScreen {
 }
 
 impl Widget<LoginData> for LoginScreen {
-    fn lifecycle(&mut self, ctx: &mut LifeCycleCtx, event: &LifeCycle, data: &LoginData, env: &Env) {
+    fn lifecycle(
+        &mut self,
+        ctx: &mut LifeCycleCtx,
+        event: &LifeCycle,
+        data: &LoginData,
+        env: &Env,
+    ) {
         if let LifeCycle::WidgetAdded = event {
             ctx.submit_command(LOG_IN);
         }
@@ -67,27 +76,26 @@ pub fn build_login_screen() -> impl Widget<LoginData> {
         .center()
         .lens(LoginData::password);
 
-    let log_in_button = Button::new("Log in")
-        .on_click(|ctx: &mut EventCtx, _data: &mut LoginData, _env| {
+    let log_in_button =
+        Button::new("Log in").on_click(|ctx: &mut EventCtx, _data: &mut LoginData, _env| {
             ctx.submit_command(LOG_IN);
         });
-
 
     let remember_radio_box = Checkbox::new("Remember credentials")
         .lens(LoginData::remember)
         .center()
         .padding(8.0);
 
-
-    LoginScreen::new(Box::new(Flex::column()
-        .with_child(username_box)
-        .with_spacer(LoginLayoutConfig::VERTICAL_WIDGET_SPACING)
-        .with_child(password_box)
-        .with_spacer(LoginLayoutConfig::VERTICAL_WIDGET_SPACING)
-        .with_child(remember_radio_box)
-        .with_spacer(LoginLayoutConfig::VERTICAL_WIDGET_SPACING)
-        .with_child(log_in_button)
-        .with_spacer(LoginLayoutConfig::VERTICAL_WIDGET_SPACING)
-        ))
-        .align_vertical(UnitPoint::CENTER)
+    LoginScreen::new(Box::new(
+        Flex::column()
+            .with_child(username_box)
+            .with_spacer(LoginLayoutConfig::VERTICAL_WIDGET_SPACING)
+            .with_child(password_box)
+            .with_spacer(LoginLayoutConfig::VERTICAL_WIDGET_SPACING)
+            .with_child(remember_radio_box)
+            .with_spacer(LoginLayoutConfig::VERTICAL_WIDGET_SPACING)
+            .with_child(log_in_button)
+            .with_spacer(LoginLayoutConfig::VERTICAL_WIDGET_SPACING),
+    ))
+    .align_vertical(UnitPoint::CENTER)
 }

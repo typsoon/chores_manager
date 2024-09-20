@@ -10,5 +10,5 @@ CREATE RULE addChores AS ON INSERT TO choresview DO INSTEAD (
 
 CREATE RULE addOneTimeChores AS ON INSERT TO onetimechoresview DO INSTEAD (
     -- noinspection SqlInsertNullIntoNotNull
-    INSERT INTO onetimechores(update_id, mapping_id, date_of) VALUES (null, getmapping(new.person_name, new.chore_name), new.date_of);
+    INSERT INTO onetimechores(time_slot_id, mapping_id, date_of) VALUES (null, getmapping(new.person_name, new.chore_name), new.date_of);
 );

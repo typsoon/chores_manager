@@ -1,11 +1,11 @@
-use std::ops::Deref;
 use crate::model::types::{ChoreTypeRecord, PersonRecord};
 use druid::Data;
+use std::ops::Deref;
 
 #[derive(Clone, Data)]
 pub struct PersonRecordWrapper {
     #[data(eq)]
-    person_record: PersonRecord
+    person_record: PersonRecord,
 }
 
 impl PersonRecordWrapper {
@@ -25,7 +25,7 @@ impl Deref for PersonRecordWrapper {
 #[derive(Clone, Data)]
 pub struct ChoreTypeRecordWrapper {
     #[data(eq)]
-    chore_record: ChoreTypeRecord
+    chore_record: ChoreTypeRecord,
 }
 
 impl ChoreTypeRecordWrapper {
