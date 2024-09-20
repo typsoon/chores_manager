@@ -1,4 +1,4 @@
-use crate::model::types::{ChoreTypeRecord, PersonRecord};
+use crate::model::types::{ChoreTypeRecord, FullChoreDataRecord, PersonRecord};
 use druid::Data;
 use std::ops::Deref;
 
@@ -39,5 +39,27 @@ impl Deref for ChoreTypeRecordWrapper {
 
     fn deref(&self) -> &Self::Target {
         &self.chore_record
+    }
+}
+
+#[derive(Clone, Data)]
+pub struct FullChoreDataWrapper {
+    #[data(eq)]
+    full_chore_data_record: FullChoreDataRecord,
+}
+
+impl FullChoreDataWrapper {
+    pub fn new(full_chore_data_record: FullChoreDataRecord) -> Self {
+        Self {
+            full_chore_data_record,
+        }
+    }
+}
+
+impl Deref for FullChoreDataWrapper {
+    type Target = FullChoreDataRecord;
+
+    fn deref(&self) -> &Self::Target {
+        &self.full_chore_data_record
     }
 }

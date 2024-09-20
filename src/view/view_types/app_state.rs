@@ -96,18 +96,17 @@ pub struct DatabaseData {
     viewmodel: Rc<dyn ViewModel>,
     #[data(eq)]
     chores_data: ChoresData,
-    #[data(eq)]
-    month_data: MonthData,
     people: Vector<PersonRecordWrapper>,
     chores: Vector<ChoreTypeRecordWrapper>,
+    #[data(eq)]
+    month_data: MonthData,
 }
 
 impl DatabaseData {
     fn update_data(&mut self, month_data: MonthData) {
-        self.month_data = month_data;
         self.chores_data = self
             .viewmodel
-            .get_chores_in_interval(self.month_data.first_day, self.month_data.last_day)
+            .get_chores_in_interval(month_data.first_day, month_data.last_day)
             .unwrap();
         self.people = self
             .viewmodel
@@ -131,10 +130,18 @@ impl DatabaseData {
         Self {
             viewmodel,
             chores_data: Default::default(),
-            month_data: Default::default(),
             people: Default::default(),
             chores: Default::default(),
+            month_data: Default::default(),
         }
+    }
+
+    pub fn get_chores_data(&self) -> &ChoresData {
+        &self.chores_data
+    }
+
+    pub fn get_month_data(&self) -> &MonthData {
+        &self.month_data
     }
 }
 

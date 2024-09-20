@@ -39,7 +39,7 @@ impl DateUtils {
     }
 }
 
-#[derive(Clone, Default, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct MonthData {
     pub first_day: NaiveDate,
     pub last_day: NaiveDate,
@@ -55,5 +55,11 @@ impl MonthData {
 
     pub fn current() -> Self {
         DateUtils::get_month_date_range(Local::now()).unwrap()
+    }
+}
+
+impl Default for MonthData {
+    fn default() -> Self {
+        Self::current()
     }
 }

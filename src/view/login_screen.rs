@@ -1,10 +1,9 @@
 use crate::view::view_types::app_state::LoginData;
 use crate::view::view_types::selectors::LOG_IN;
-use delegate::delegate;
-use druid::widget::{Button, Checkbox, Flex, TextBox};
+use druid::widget::{Button, Checkbox, Controller, Flex, TextBox};
 use druid::{
-    BoxConstraints, Env, Event, EventCtx, FontDescriptor, FontFamily, FontWeight, LayoutCtx,
-    LifeCycle, LifeCycleCtx, PaintCtx, Size, UnitPoint, UpdateCtx, Widget, WidgetExt,
+    Env, EventCtx, FontDescriptor, FontFamily, FontWeight, LifeCycle, LifeCycleCtx, UnitPoint,
+    Widget, WidgetExt,
 };
 
 struct LoginLayoutConfig;
@@ -15,19 +14,12 @@ impl LoginLayoutConfig {
     pub const FONT_SIZE: f64 = 18.0;
 }
 
-pub struct LoginScreen {
-    widget: Box<dyn Widget<LoginData>>,
-}
+pub struct LoginScreenController;
 
-impl LoginScreen {
-    fn new(widget: Box<dyn Widget<LoginData>>) -> Self {
-        Self { widget }
-    }
-}
-
-impl Widget<LoginData> for LoginScreen {
+impl<W: Widget<LoginData>> Controller<LoginData, W> for LoginScreenController {
     fn lifecycle(
         &mut self,
+        child: &mut W,
         ctx: &mut LifeCycleCtx,
         event: &LifeCycle,
         data: &LoginData,
@@ -36,16 +28,7 @@ impl Widget<LoginData> for LoginScreen {
         if let LifeCycle::WidgetAdded = event {
             ctx.submit_command(LOG_IN);
         }
-        self.widget.lifecycle(ctx, event, data, env);
-    }
-
-    delegate! {
-        to self.widget {
-            fn event(&mut self, ctx: &mut EventCtx, event: &Event, data: &mut LoginData, env: &Env);
-            fn update(&mut self, ctx: &mut UpdateCtx, old_data: &LoginData, data: &LoginData, env: &Env);
-            fn layout(&mut self, ctx: &mut LayoutCtx, bc: &BoxConstraints, data: &LoginData, env: &Env) -> Size;
-            fn paint(&mut self, ctx: &mut PaintCtx, data: &LoginData, env: &Env);
-        }
+        child.lifecycle(ctx, event, data, env)
     }
 }
 
@@ -86,7 +69,7 @@ pub fn build_login_screen() -> impl Widget<LoginData> {
         .center()
         .padding(8.0);
 
-    LoginScreen::new(Box::new(
+    Box::new(
         Flex::column()
             .with_child(username_box)
             .with_spacer(LoginLayoutConfig::VERTICAL_WIDGET_SPACING)
@@ -96,6 +79,7 @@ pub fn build_login_screen() -> impl Widget<LoginData> {
             .with_spacer(LoginLayoutConfig::VERTICAL_WIDGET_SPACING)
             .with_child(log_in_button)
             .with_spacer(LoginLayoutConfig::VERTICAL_WIDGET_SPACING),
-    ))
+    )
     .align_vertical(UnitPoint::CENTER)
+    .controller(LoginScreenController)
 }
