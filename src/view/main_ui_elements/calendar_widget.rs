@@ -35,7 +35,7 @@ impl CalendarWidgetController {
         let mut row = Flex::row();
 
         important_days.iter().for_each(|day| {
-            let container = Container::new(build_day_widget_list(*day))
+            let container = Container::new(build_day_widget_list(day))
                 .background(get_right_color(day)) // Darker blue background
                 .border(Color::BLACK, 2.0) // Black border around the rectangle
                 .fix_size(DAY_WIDGET_WIDTH, DAY_WIDGET_HEIGHT);
@@ -99,7 +99,7 @@ impl Lens<DatabaseData, Vector<FullChoreDataWrapper>> for DayWidgetLens {
     }
 }
 
-fn build_day_widget_list(day: NaiveDate) -> impl Widget<DatabaseData> {
+fn build_day_widget_list(day: &NaiveDate) -> impl Widget<DatabaseData> {
     let column = Flex::column().with_child(Padding::new(
         (0.0, 10.0, 0.0, 0.0),
         Label::new(day.day().to_string()),
@@ -118,7 +118,7 @@ fn build_day_widget_list(day: NaiveDate) -> impl Widget<DatabaseData> {
     });
 
     column.with_child(
-        Padding::new((5.0, 5.0, 5.0, 0.0), Scroll::new(list)).lens(DayWidgetLens::new(day)),
+        Padding::new((5.0, 5.0, 5.0, 0.0), Scroll::new(list)).lens(DayWidgetLens::new(*day)),
     )
 }
 

@@ -42,7 +42,7 @@ CREATE TABLE chores_manager.CompletedChores (
 CREATE TABLE chores_manager.ScheduledChores (
     time_slot_id INTEGER NOT NULL REFERENCES chores_manager.ScheduleUpdates ,
     mapping_id INTEGER NOT NULL REFERENCES PeopleChores ,
-    interval INTERVAL NOT NULL ,
+    interval INTERVAL NOT NULL Check ( interval > '0' ),
     date_from TIMESTAMP NOT NULL ,
     date_to TIMESTAMP NOT NULL ,
     CHECK ( date_from < date_to )

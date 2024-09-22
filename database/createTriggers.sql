@@ -33,3 +33,35 @@ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER insertOneTimeChores BEFORE INSERT ON onetimechores
     FOR EACH ROW EXECUTE PROCEDURE insertOneTimeChores();
+
+
+CREATE OR REPLACE FUNCTION completeChore() RETURNS TRIGGER
+AS
+$$
+    DECLARE
+        bounds_and_interval RECORD;
+    BEGIN
+        SELECT INTO bounds_and_interval
+            time_slot_id, date_from, date_to, chore_interval
+        FROM (SELECT * FROM
+            (
+                SELECT time_slot_id, date_of AS date_from, date_of AS date_to, '1 day' AS chore_interval FROM onetimechores
+                UNION
+                SELECT sc.time_slot_id, date_from, date_to, sc.interval FROM scheduledchores sc
+            ) un WHERE un.time_slot_id = new.time_slot_id LIMIT 1) as un;
+
+        IF bounds_and_interval IS NULL THEN
+            RAISE EXCEPTION 'No such chore in database';
+        END IF;
+
+        IF bounds_and_interval.date_from + (new.iteration-1)*bounds_and_interval.chore_interval BETWEEN bounds_and_interval.date_from AND bounds_and_interval.date_to THEN
+            RETURN NEW;
+        ELSE
+            RAISE EXCEPTION 'Wrong iteration value';
+        end if;
+    END
+$$
+LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER completeChore BEFORE INSERT ON completedchores
+    FOR EACH ROW EXECUTE PROCEDURE completeChore();

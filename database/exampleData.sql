@@ -9,4 +9,9 @@ INSERT INTO onetimechoresview(person_name, chore_name, date_of) VALUES (current_
 INSERT INTO onetimechoresview(person_name, chore_name, date_of) VALUES (current_user, 'test_chore2', current_date);
 INSERT INTO onetimechoresview(person_name, chore_name, date_of) VALUES (current_user, 'test_chore3', current_date);
 
--- INSERT INTO updates(message) VALUES ('ooo');
+-- These 2 should fail
+INSERT INTO completedchores(time_slot_id, iteration, message) VALUES (1, 2, 'random');
+INSERT INTO completedchores(time_slot_id, iteration, message) VALUES (1000, 1, 'random');
+
+INSERT INTO completedchores(time_slot_id, iteration, message) VALUES (1, 1, 'random');
+DELETE FROM completedchores WHERE TRUE;

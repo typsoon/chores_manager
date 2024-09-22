@@ -75,9 +75,9 @@ impl FullChoreDataRecord {
         self.date_of
     }
 
-    pub fn who_updated(&self) -> &str {
-        &self.who_updated
-    }
+    // pub fn who_updated(&self) -> &str {
+    //     &self.who_updated
+    // }
 }
 
 #[derive(Debug)]
