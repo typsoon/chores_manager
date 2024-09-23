@@ -1,8 +1,9 @@
 use crate::view::main_ui_elements::main_ui_tabs::build_main_ui_tabs;
 use crate::view::view_types::app_state::MainStateData;
+use crate::view::view_types::selectors::CHANGE_MONTH;
 use crate::viewmodel::view_model_traits::ViewModel;
 use druid::widget::Controller;
-use druid::{Widget, WidgetExt};
+use druid::{Env, Event, EventCtx, Widget, WidgetExt};
 use std::rc::Rc;
 
 struct MainUIController {
@@ -16,7 +17,25 @@ impl MainUIController {
     }
 }
 
-impl<W: Widget<MainStateData>> Controller<MainStateData, W> for MainUIController {}
+impl<W: Widget<MainStateData>> Controller<MainStateData, W> for MainUIController {
+    fn event(
+        &mut self,
+        child: &mut W,
+        ctx: &mut EventCtx,
+        event: &Event,
+        data: &mut MainStateData,
+        env: &Env,
+    ) {
+        if let Event::Command(cmd) = event {
+            if let Some(month_data) = cmd.get(CHANGE_MONTH) {
+                data.update_data(month_data);
+                ctx.request_update();
+            }
+        }
+
+        child.event(ctx, event, data, env);
+    }
+}
 
 // pub fn build_main_ui(viewmodel: Box<dyn ViewModel>) -> MainUI {
 pub fn build_main_ui(viewmodel: Rc<impl ViewModel + 'static>) -> impl Widget<MainStateData> {

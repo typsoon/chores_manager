@@ -32,7 +32,7 @@ pub struct ChoreRecord {
 }
 
 #[allow(dead_code)]
-#[derive(QueryableByName, Debug, Eq, Hash, PartialEq)]
+#[derive(QueryableByName, Debug, Eq, Hash, PartialEq, Default)]
 pub struct ScheduledChoreRecord {
     #[diesel(sql_type = VarChar)]
     person_name: String,
@@ -46,7 +46,7 @@ pub struct ScheduledChoreRecord {
     date_to: NaiveDateTime,
 }
 
-#[derive(QueryableByName, Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(QueryableByName, Clone, Debug, Eq, Hash, PartialEq, Default)]
 pub struct FullChoreDataRecord {
     #[diesel(sql_type = VarChar)]
     person_name: String,
@@ -78,6 +78,10 @@ impl FullChoreDataRecord {
     // pub fn who_updated(&self) -> &str {
     //     &self.who_updated
     // }
+
+    pub fn was_completed(&self) -> bool {
+        self.was_completed
+    }
 }
 
 #[derive(Debug)]

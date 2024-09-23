@@ -1,5 +1,7 @@
 use crate::model::types::{ChoreTypeRecord, FullChoreDataRecord, PersonRecord};
-use druid::Data;
+use chrono::NaiveDate;
+use druid::im::Vector;
+use druid::{Data, Lens};
 use std::ops::Deref;
 
 #[derive(Clone, Data)]
@@ -63,3 +65,56 @@ impl Deref for FullChoreDataWrapper {
         &self.full_chore_data_record
     }
 }
+
+#[derive(Clone, Data)]
+pub struct NaiveDateWrapper {
+    #[data(eq)]
+    date: NaiveDate,
+}
+
+impl NaiveDateWrapper {
+    pub fn new(date: NaiveDate) -> Self {
+        Self { date }
+    }
+}
+
+impl Deref for NaiveDateWrapper {
+    type Target = NaiveDate;
+
+    fn deref(&self) -> &Self::Target {
+        &self.date
+    }
+}
+
+impl From<NaiveDate> for NaiveDateWrapper {
+    fn from(value: NaiveDate) -> Self {
+        NaiveDateWrapper { date: value }
+    }
+}
+
+#[derive(Clone, Data, Lens)]
+pub struct ChoresDataKeyVal {
+    day: NaiveDateWrapper,
+    chores: Vector<FullChoreDataWrapper>,
+    month: u32,
+}
+
+impl ChoresDataKeyVal {
+    pub fn get_day(&self) -> &NaiveDateWrapper {
+        &self.day
+    }
+
+    // pub fn get_chores(&self) -> &Vector<FullChoreDataWrapper> {
+    //     &self.chores
+    // }
+
+    pub fn new(day: NaiveDateWrapper, chores: Vector<FullChoreDataWrapper>, month: u32) -> Self {
+        Self { day, chores, month }
+    }
+
+    pub fn get_month(&self) -> u32 {
+        self.month
+    }
+}
+
+pub type ImportantWeeks = Vector<Vector<ChoresDataKeyVal>>;

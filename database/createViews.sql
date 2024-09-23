@@ -9,7 +9,7 @@ CREATE VIEW chores_manager.ChoresView AS (
 );
 
 CREATE VIEW chores_manager.ScheduledChoresView AS (
-    SELECT person_name, chore_name, interval, date_from, date_to
+    SELECT person_name, chore_name, chore_interval, date_from, date_to
     FROM scheduledchores JOIN chores_manager.PeopleChoresPrivateView USING (mapping_id)
 );
 

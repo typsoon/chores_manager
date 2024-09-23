@@ -14,4 +14,5 @@ INSERT INTO completedchores(time_slot_id, iteration, message) VALUES (1, 2, 'ran
 INSERT INTO completedchores(time_slot_id, iteration, message) VALUES (1000, 1, 'random');
 
 INSERT INTO completedchores(time_slot_id, iteration, message) VALUES (1, 1, 'random');
+INSERT INTO completedchores(time_slot_id, iteration, message) VALUES (2, 1, 'random');
 DELETE FROM completedchores WHERE TRUE;
