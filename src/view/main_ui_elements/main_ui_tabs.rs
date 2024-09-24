@@ -27,8 +27,9 @@ pub fn build_main_ui_tabs() -> impl Widget<MainStateData> {
                 Flex::row()
                     .with_child(build_list_of_people())
                     .with_default_spacer()
-                    .with_child(build_list_of_chores()),
-            ),
+                    .with_child(build_list_of_chores())
+                    .expand(),
+            ), // .debug_paint_layout(),
         )
         .with_tab("Schedule chores", Label::new("Not implemented yet"))
         .with_tab("Complete chore", Label::new("Not implemented yet"))

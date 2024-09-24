@@ -1,10 +1,9 @@
 use crate::model::types::Credentials;
-use crate::view::main_ui_elements::main_ui::build_main_ui;
+use crate::view::main_ui_elements::main_ui_controller::build_main_ui;
 use crate::view::view_types::app_state::{AppState, MainStateLens};
 use crate::view::view_types::selectors::LOG_IN;
 use crate::viewmodel::view_model_impl::create_view_model;
 use druid::{AppDelegate, Command, DelegateCtx, Env, Handled, Target, WidgetExt, WindowDesc};
-use std::rc::Rc;
 
 const MAIN_WINDOW_WIDTH: f64 = 1500.0;
 const MAIN_WINDOW_HEIGHT: f64 = 800.0;
@@ -21,11 +20,11 @@ impl WindowManager {
             // TODO: Make this better
             delegate_ctx.submit_command(druid::commands::CLOSE_ALL_WINDOWS);
 
-            let viewmodel_rc = Rc::new(viewmodel);
-            app_state.move_to_main_state(viewmodel_rc.clone());
-            let main_window = WindowDesc::new(build_main_ui(viewmodel_rc).lens(MainStateLens))
-                .title("Chores Manager")
-                .window_size((MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT));
+            app_state.move_to_main_state(&viewmodel);
+            let main_window =
+                WindowDesc::new(build_main_ui(Box::new(viewmodel)).lens(MainStateLens))
+                    .title("Chores Manager")
+                    .window_size((MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT));
 
             delegate_ctx.new_window(main_window);
             true

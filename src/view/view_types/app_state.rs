@@ -11,7 +11,6 @@ use druid::im::{vector, Vector};
 use druid::{Data, Lens};
 use std::default::Default;
 use std::env;
-use std::rc::Rc;
 
 #[derive(Clone, Data)]
 pub enum AppState {
@@ -24,10 +23,10 @@ impl AppState {
         LoginState(LoginData::default())
     }
 
-    pub fn move_to_main_state(&mut self, viewmodel: Rc<impl ViewModel + 'static>) {
+    pub fn move_to_main_state(&mut self, viewmodel: &dyn ViewModel) {
         // *self = Main(MainState { chores_data: Default::default() });
-        let mut database_data = DatabaseData::new(viewmodel);
-        database_data.update_data(&MonthData::current());
+        let mut database_data = DatabaseData::new();
+        database_data.change_month(MonthData::current(), viewmodel);
         *self = MainState(MainStateData {
             database_data,
             input_data: Default::default(),
@@ -51,8 +50,16 @@ pub struct MainStateData {
 }
 
 impl MainStateData {
-    pub fn update_data(&mut self, month_data: &MonthData) {
-        self.database_data.update_data(month_data);
+    pub fn update_data(&mut self, viewmodel: &dyn ViewModel) {
+        self.database_data.update_data(viewmodel);
+    }
+
+    pub fn change_month(&mut self, month_data: MonthData, viewmodel: &dyn ViewModel) {
+        self.database_data.change_month(month_data, viewmodel);
+    }
+
+    pub fn get_input_data(&self) -> &MainStateInputData {
+        &self.input_data
     }
 }
 
@@ -99,11 +106,8 @@ impl Default for LoginData {
     }
 }
 
-#[derive(Clone, Data, Lens)]
+#[derive(Clone, Data, Lens, Default)]
 pub struct DatabaseData {
-    #[data(ignore)]
-    #[lens(ignore)]
-    viewmodel: Rc<dyn ViewModel>,
     #[data(eq)]
     chores_data: ChoresData,
     people: Vector<PersonRecordWrapper>,
@@ -113,23 +117,23 @@ pub struct DatabaseData {
 }
 
 impl DatabaseData {
-    fn update_data(&mut self, month_data: &MonthData) {
-        self.month_data = month_data.clone();
+    fn change_month(&mut self, month_data: MonthData, viewmodel: &dyn ViewModel) {
+        self.month_data = month_data;
+        self.update_data(viewmodel);
+    }
 
-        self.chores_data = self
-            .viewmodel
-            .get_chores_in_interval(month_data.first_day(), month_data.last_day())
+    fn update_data(&mut self, viewmodel: &dyn ViewModel) {
+        self.chores_data = viewmodel
+            .get_chores_in_interval(self.month_data.first_day(), self.month_data.last_day())
             .unwrap();
-        self.people = self
-            .viewmodel
+        self.people = viewmodel
             .get_people()
             .unwrap()
             .into_iter()
             .map(PersonRecordWrapper::new)
             .collect();
 
-        self.chores = self
-            .viewmodel
+        self.chores = viewmodel
             .get_chores()
             .unwrap()
             .into_iter()
@@ -167,9 +171,8 @@ impl DatabaseData {
         answer
     }
 
-    pub fn new(viewmodel: Rc<dyn ViewModel>) -> Self {
+    pub fn new() -> Self {
         Self {
-            viewmodel,
             chores_data: Default::default(),
             people: Default::default(),
             chores: Default::default(),
@@ -190,6 +193,22 @@ impl DatabaseData {
 pub struct MainStateInputData {
     added_person_name: String,
     added_chore_type_name: String,
+    added_chore_name: String,
+    added_chore_description: String,
+}
+
+impl MainStateInputData {
+    pub fn get_added_person_name(&self) -> &str {
+        &self.added_person_name
+    }
+
+    pub fn get_added_chore_type_name(&self) -> &str {
+        &self.added_chore_type_name
+    }
+
+    pub fn get_added_chore_description(&self) -> &str {
+        &self.added_chore_description
+    }
 }
 
 pub struct LoginDataLens;

@@ -35,7 +35,7 @@ impl DatabaseService for ViewModelImpl {
             fn add_scheduled_chore(&mut self, scheduled_chore_record: ScheduledChoreRecord);
             fn add_one_time_chore(&mut self, one_time_chore_record: ChoreRecord);
             fn add_person(&mut self, person_record: PersonRecord);
-            fn add_chore(&mut self, chore_record: ChoreRecord);
+            fn add_chore_type(&mut self, chore_type_record: ChoreTypeRecord);
         }
     }
 }

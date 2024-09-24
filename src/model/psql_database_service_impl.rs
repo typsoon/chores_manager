@@ -7,7 +7,7 @@ use crate::model::types::{
 use crate::model::types::{ChoresData, Credentials};
 use chrono::NaiveDate;
 use diesel::r2d2::{ConnectionManager, Error, ManageConnection, Pool};
-use diesel::sql_types::Date;
+use diesel::sql_types::{Date, VarChar};
 use diesel::{sql_query, PgConnection, RunQueryDsl};
 use dotenv::dotenv;
 use std::env;
@@ -106,10 +106,17 @@ impl DatabaseService for PSQLDatabaseService {
     }
 
     fn add_person(&mut self, person_record: PersonRecord) {
-        todo!()
+        sql_query("INSERT INTO PeopleView(person_name) VALUES ($1)")
+            .bind::<VarChar, _>(person_record.person_name())
+            .execute(&mut self.connection_pool.get().unwrap())
+            .unwrap();
     }
 
-    fn add_chore(&mut self, chore_record: ChoreRecord) {
-        todo!()
+    fn add_chore_type(&mut self, chore_type_record: ChoreTypeRecord) {
+        sql_query("INSERT INTO ChoresView(chore_name, chore_description) VALUES ($1, $2)")
+            .bind::<VarChar, _>(chore_type_record.chore_name())
+            .bind::<VarChar, _>(chore_type_record.chore_description())
+            .execute(&mut self.connection_pool.get().unwrap())
+            .unwrap();
     }
 }
