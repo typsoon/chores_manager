@@ -13,6 +13,13 @@ CREATE RULE addOneTimeChores AS ON INSERT TO onetimechoresview DO INSTEAD (
     INSERT INTO onetimechores(time_slot_id, mapping_id, date_of)
     VALUES (null, getmapping(NEW.person_name, NEW.chore_name), NEW.date_of);
 );
+
+CREATE RULE addScheduledChores AS ON INSERT TO scheduledchoresview DO INSTEAD (
+    -- noinspection SqlInsertNullIntoNotNull
+    INSERT INTO scheduledchores(time_slot_id, mapping_id, chore_interval, date_from, date_to)
+    VALUES (null, getmapping(NEW.person_name, NEW.chore_name), NEW.chore_interval, NEW.date_from, NEW.date_to);
+);
+
 CREATE RULE completeChore AS ON INSERT TO completedchoresview DO INSTEAD (
     INSERT INTO completedchores(time_slot_id, iteration, message)
     VALUES (

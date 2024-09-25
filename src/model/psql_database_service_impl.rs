@@ -2,13 +2,13 @@ use crate::model::traits::DatabaseService;
 use crate::model::traits::ReadOnlyDatabaseService;
 use crate::model::types::ChoreTypeRecord;
 use crate::model::types::CompletedChoreData;
-use crate::model::types::{
-    ChoreRecord, DatabaseError, FullChoreDataRecord, PersonRecord, ScheduledChoreRecord,
-};
 use crate::model::types::{ChoresData, Credentials};
+use crate::model::types::{
+    DatabaseError, FullChoreDataRecord, OneTimeChoreRecord, PersonRecord, ScheduledChoreRecord,
+};
 use chrono::NaiveDate;
 use diesel::r2d2::{ConnectionManager, Error, ManageConnection, Pool};
-use diesel::sql_types::{Date, Integer, VarChar};
+use diesel::sql_types::{Date, Integer, Interval, Timestamp, VarChar};
 use diesel::{sql_query, PgConnection, RunQueryDsl};
 use dotenv::dotenv;
 use std::env;
@@ -99,11 +99,25 @@ impl ReadOnlyDatabaseService for PSQLDatabaseService {
 #[allow(dead_code, unused_variables)]
 impl DatabaseService for PSQLDatabaseService {
     fn add_scheduled_chore(&mut self, scheduled_chore_record: ScheduledChoreRecord) {
-        todo!()
+        sql_query("INSERT INTO ScheduledChoresView(person_name, chore_name, chore_interval, date_from, date_to) VALUES ($1, $2, $3, $4, $5)", )
+            .bind::<VarChar, _>(scheduled_chore_record.person_name())
+            .bind::<VarChar, _>(scheduled_chore_record.chore_name())
+            .bind::<Interval, _>(scheduled_chore_record.interval())
+            .bind::<Timestamp, _>(scheduled_chore_record.date_from())
+            .bind::<Timestamp, _>(scheduled_chore_record.date_to())
+            .execute(&mut self.connection_pool.get().unwrap())
+            .unwrap();
     }
 
-    fn add_one_time_chore(&mut self, one_time_chore_record: ChoreRecord) {
-        todo!()
+    fn add_one_time_chore(&mut self, one_time_chore_record: OneTimeChoreRecord) {
+        sql_query(
+            "INSERT INTO OneTimeChoresView(person_name, chore_name, date_of) VALUES ($1, $2, $3)",
+        )
+        .bind::<VarChar, _>(one_time_chore_record.person_name())
+        .bind::<VarChar, _>(one_time_chore_record.chore_name())
+        .bind::<Timestamp, _>(one_time_chore_record.date_of())
+        .execute(&mut self.connection_pool.get().unwrap())
+        .unwrap();
     }
 
     fn add_person(&mut self, person_record: PersonRecord) {

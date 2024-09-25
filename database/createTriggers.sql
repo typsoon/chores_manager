@@ -1,31 +1,46 @@
 SET SEARCH_PATH TO chores_manager;
 
+CREATE OR REPLACE FUNCTION __getPersonAndChore(mapping_id INTEGER) RETURNS RECORD
+    AS $$
+        DECLARE
+            person_and_chore RECORD;
+        BEGIN
+            SELECT p.person_name, c.chore_name
+            INTO person_and_chore
+            FROM peoplechores pc
+                     JOIN chores c ON pc.chore_id = c.chore_id
+                     JOIN people p ON pc.person_id = p.person_id
+            WHERE pc.mapping_id = __getPersonAndChore.mapping_id;
+            RETURN person_and_chore;
+        END;
+    $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION __insertMessageReturnTimeSlotId(update_message VARCHAR) RETURNS INTEGER
+    AS $$
+        DECLARE
+            func_time_slot_id INTEGER;
+        BEGIN
+            INSERT INTO scheduleupdates(message)
+            VALUES(update_message)
+            RETURNING time_slot_id INTO func_time_slot_id;
+            RETURN func_time_slot_id;
+        END;
+    $$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION insertOneTimeChores() RETURNS TRIGGER
 AS
 $$
     DECLARE
-        func_time_slot_id INTEGER;
-        person_and_chore RECORD;
+        person_and_chore RECORD = __getPersonAndChore(NEW.mapping_id);
         func_message VARCHAR;
     BEGIN
-        SELECT p.person_name, c.chore_name
-        INTO person_and_chore
-        FROM peoplechores pc
-                 JOIN chores c ON pc.chore_id = c.chore_id
-                 JOIN people p ON pc.person_id = p.person_id
-        WHERE pc.mapping_id = NEW.mapping_id;
-
 --         message = 'Added one time chore (chore_name, person_name)=(' || person_and_chore || ')';
         func_message = 'Added one time chore person_name = '
                        || person_and_chore.person_name
                        || ', chore_name = '
                        || person_and_chore.chore_name;
 
-        INSERT INTO scheduleupdates(message)
-        VALUES(func_message)
-        RETURNING time_slot_id INTO func_time_slot_id;
-
-        new.time_slot_id = func_time_slot_id;
+        new.time_slot_id = __insertMessageReturnTimeSlotId(func_message);
         RETURN new;
     END
 $$
@@ -33,6 +48,28 @@ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER insertOneTimeChores BEFORE INSERT ON onetimechores
     FOR EACH ROW EXECUTE PROCEDURE insertOneTimeChores();
+
+CREATE OR REPLACE FUNCTION insertScheduledChores() RETURNS TRIGGER
+AS
+$$
+    DECLARE
+        person_and_chore RECORD = __getPersonAndChore(NEW.mapping_id);
+        func_message VARCHAR;
+    BEGIN
+--         message = 'Added one time chore (chore_name, person_name)=(' || person_and_chore || ')';
+        func_message = 'Added scheduled chore person_name = '
+                       || person_and_chore.person_name
+                       || ', chore_name = '
+                       || person_and_chore.chore_name;
+
+        new.time_slot_id = __insertMessageReturnTimeSlotId(func_message);
+        RETURN new;
+    END
+$$
+LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER insertScheduledChores BEFORE INSERT ON scheduledchores
+    FOR EACH ROW EXECUTE PROCEDURE insertScheduledChores();
 
 
 CREATE OR REPLACE FUNCTION completeChore() RETURNS TRIGGER

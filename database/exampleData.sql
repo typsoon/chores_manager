@@ -13,6 +13,8 @@ INSERT INTO onetimechoresview(person_name, chore_name, date_of) VALUES (current_
 INSERT INTO onetimechoresview(person_name, chore_name, date_of) VALUES (current_user, 'test_chore4', current_date);
 INSERT INTO onetimechoresview(person_name, chore_name, date_of) VALUES (current_user, 'test_chore5', current_date);
 
+INSERT INTO scheduledchoresview(person_name, chore_name, chore_interval, date_from, date_to) VALUES (current_user, 'test_chore', '1 day', current_timestamp, current_timestamp + '10 day');
+
 -- These 2 should fail
 INSERT INTO completedchoresview(chore_name, iteration, message) VALUES ('test_chore', 2, 'random');
 INSERT INTO completedchoresview(chore_name, iteration, message) VALUES ('test_choreeeeeee', 1, 'random');

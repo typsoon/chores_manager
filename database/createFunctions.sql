@@ -1,12 +1,11 @@
-SET SEARCH_PATH TO chores_manager;
-
-CREATE OR REPLACE FUNCTION getPersonName(person_id INT) RETURNS VARCHAR AS
+CREATE OR REPLACE FUNCTION chores_manager.getPersonName(person_id INT) RETURNS VARCHAR AS
     $$
         BEGIN
-            RETURN (SELECT person_name FROM people p WHERE p.person_id = getPersonName.person_id LIMIT 1);
+            RETURN (SELECT person_name FROM chores_manager.people p WHERE p.person_id = getPersonName.person_id LIMIT 1);
         END;
     $$ LANGUAGE plpgsql;
 
+SET SEARCH_PATH TO chores_manager;
 
 CREATE OR REPLACE FUNCTION wasCompleted(time_slot_id INTEGER, iteration INTEGER) RETURNS BOOLEAN AS
     $$
@@ -56,7 +55,7 @@ $$
                                  act_date, getPersonName(scheduled_chore.who_updated),
                                  iteration,
                                  wasCompleted(scheduled_chore.time_slot_id, iteration))::chores_manager.chore_record);
-                act_date := act_date + scheduled_chore.interval;
+                act_date := act_date + scheduled_chore.chore_interval;
                 iteration := iteration+1;
             end loop;
         end loop;

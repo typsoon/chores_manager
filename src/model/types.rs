@@ -49,7 +49,7 @@ impl ChoreTypeRecord {
 
 #[allow(dead_code)]
 #[derive(QueryableByName, Clone, Debug, Eq, Hash, PartialEq)]
-pub struct ChoreRecord {
+pub struct OneTimeChoreRecord {
     #[diesel(sql_type = VarChar)]
     person_name: String,
     #[diesel(sql_type = VarChar)]
@@ -58,8 +58,30 @@ pub struct ChoreRecord {
     date_of: NaiveDateTime,
 }
 
+impl OneTimeChoreRecord {
+    pub fn new(person_name: String, chore_name: String, date_of: NaiveDateTime) -> Self {
+        Self {
+            person_name,
+            chore_name,
+            date_of,
+        }
+    }
+
+    pub fn person_name(&self) -> &str {
+        &self.person_name
+    }
+
+    pub fn chore_name(&self) -> &str {
+        &self.chore_name
+    }
+
+    pub fn date_of(&self) -> NaiveDateTime {
+        self.date_of
+    }
+}
+
 #[allow(dead_code)]
-#[derive(QueryableByName, Debug, Eq, Hash, PartialEq, Default)]
+#[derive(QueryableByName, Clone, Debug, Eq, Hash, PartialEq, Default)]
 pub struct ScheduledChoreRecord {
     #[diesel(sql_type = VarChar)]
     person_name: String,
@@ -71,6 +93,44 @@ pub struct ScheduledChoreRecord {
     date_from: NaiveDateTime,
     #[diesel(sql_type = Timestamp)]
     date_to: NaiveDateTime,
+}
+
+impl ScheduledChoreRecord {
+    pub fn new(
+        person_name: String,
+        chore_name: String,
+        interval: Duration,
+        date_from: NaiveDateTime,
+        date_to: NaiveDateTime,
+    ) -> Self {
+        Self {
+            person_name,
+            chore_name,
+            interval,
+            date_from,
+            date_to,
+        }
+    }
+
+    pub fn person_name(&self) -> &str {
+        &self.person_name
+    }
+
+    pub fn chore_name(&self) -> &str {
+        &self.chore_name
+    }
+
+    pub fn interval(&self) -> Duration {
+        self.interval
+    }
+
+    pub fn date_from(&self) -> NaiveDateTime {
+        self.date_from
+    }
+
+    pub fn date_to(&self) -> NaiveDateTime {
+        self.date_to
+    }
 }
 
 #[derive(QueryableByName, Clone, Debug, Eq, Hash, PartialEq, Default)]

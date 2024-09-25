@@ -6,7 +6,7 @@ use crate::view::view_types::wrappers::{
     NaiveDateWrapper, PersonRecordWrapper,
 };
 use crate::viewmodel::view_model_traits::ViewModel;
-use chrono::{Datelike, Weekday};
+use chrono::{Datelike, Days, Weekday};
 use druid::im::{vector, Vector};
 use druid::{Data, Lens};
 use std::default::Default;
@@ -124,7 +124,16 @@ impl DatabaseData {
 
     fn update_data(&mut self, viewmodel: &dyn ViewModel) {
         self.chores_data = viewmodel
-            .get_chores_in_interval(self.month_data.first_day(), self.month_data.last_day())
+            .get_chores_in_interval(
+                self.month_data
+                    .first_day()
+                    .checked_sub_days(Days::new(7))
+                    .unwrap(),
+                self.month_data
+                    .last_day()
+                    .checked_add_days(Days::new(7))
+                    .unwrap(),
+            )
             .unwrap();
         self.people = viewmodel
             .get_people()

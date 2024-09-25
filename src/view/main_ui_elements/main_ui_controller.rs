@@ -1,7 +1,8 @@
 use crate::view::main_ui_elements::main_ui_tabs::build_main_ui_tabs;
 use crate::view::view_types::app_state::MainStateData;
 use crate::view::view_types::selectors::{
-    ADD_CHORE_TYPE, ADD_PERSON, CHANGE_MONTH, COMPLETE_CHORE,
+    ADD_CHORE_TYPE, ADD_ONE_TIME_CHORE, ADD_PERSON, ADD_SCHEDULED_CHORE, CHANGE_MONTH,
+    COMPLETE_CHORE,
 };
 use crate::viewmodel::view_model_traits::ViewModel;
 use druid::widget::Controller;
@@ -44,6 +45,18 @@ impl<W: Widget<MainStateData>> Controller<MainStateData, W> for MainUIController
 
             if let Some(completion_data) = cmd.get(COMPLETE_CHORE) {
                 self.viewmodel.complete_chore(completion_data.clone());
+                data.update_data(self.viewmodel.deref());
+            }
+
+            if let Some(one_time_chore_record) = cmd.get(ADD_ONE_TIME_CHORE) {
+                self.viewmodel
+                    .add_one_time_chore(one_time_chore_record.clone());
+                data.update_data(self.viewmodel.deref());
+            }
+
+            if let Some(scheduled_chore_record) = cmd.get(ADD_SCHEDULED_CHORE) {
+                self.viewmodel
+                    .add_scheduled_chore(scheduled_chore_record.clone());
                 data.update_data(self.viewmodel.deref());
             }
             // ctx.request_update();

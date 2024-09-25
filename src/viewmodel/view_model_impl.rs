@@ -3,7 +3,7 @@ use crate::model::traits::{DatabaseService, ReadOnlyDatabaseService};
 use crate::model::types::ChoreTypeRecord;
 use crate::model::types::CompletedChoreData;
 use crate::model::types::{
-    ChoreRecord, ChoresData, Credentials, DatabaseError, PersonRecord, ScheduledChoreRecord,
+    ChoresData, Credentials, DatabaseError, OneTimeChoreRecord, PersonRecord, ScheduledChoreRecord,
 };
 use crate::viewmodel::view_model_traits::ViewModel;
 use chrono::NaiveDate;
@@ -34,7 +34,7 @@ impl DatabaseService for ViewModelImpl {
     delegate! {
         to self.database_service {
             fn add_scheduled_chore(&mut self, scheduled_chore_record: ScheduledChoreRecord);
-            fn add_one_time_chore(&mut self, one_time_chore_record: ChoreRecord);
+            fn add_one_time_chore(&mut self, one_time_chore_record: OneTimeChoreRecord);
             fn add_person(&mut self, person_record: PersonRecord);
             fn add_chore_type(&mut self, chore_type_record: ChoreTypeRecord);
             fn complete_chore(&mut self, completed_chore_data: CompletedChoreData);
