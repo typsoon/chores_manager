@@ -1,1 +1,1 @@
-DROP SCHEMA chores_manager CASCADE ;
+DROP SCHEMA IF EXISTS chores_manager CASCADE ;

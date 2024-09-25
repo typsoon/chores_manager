@@ -1,6 +1,8 @@
 use crate::view::main_ui_elements::main_ui_tabs::build_main_ui_tabs;
 use crate::view::view_types::app_state::MainStateData;
-use crate::view::view_types::selectors::{ADD_CHORE_TYPE, ADD_PERSON, CHANGE_MONTH};
+use crate::view::view_types::selectors::{
+    ADD_CHORE_TYPE, ADD_PERSON, CHANGE_MONTH, COMPLETE_CHORE,
+};
 use crate::viewmodel::view_model_traits::ViewModel;
 use druid::widget::Controller;
 use druid::{Env, Event, EventCtx, Widget, WidgetExt};
@@ -40,6 +42,10 @@ impl<W: Widget<MainStateData>> Controller<MainStateData, W> for MainUIController
                 data.update_data(self.viewmodel.deref());
             }
 
+            if let Some(completion_data) = cmd.get(COMPLETE_CHORE) {
+                self.viewmodel.complete_chore(completion_data.clone());
+                data.update_data(self.viewmodel.deref());
+            }
             // ctx.request_update();
         }
 

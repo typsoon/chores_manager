@@ -14,9 +14,12 @@ INSERT INTO onetimechoresview(person_name, chore_name, date_of) VALUES (current_
 INSERT INTO onetimechoresview(person_name, chore_name, date_of) VALUES (current_user, 'test_chore5', current_date);
 
 -- These 2 should fail
-INSERT INTO completedchores(time_slot_id, iteration, message) VALUES (1, 2, 'random');
-INSERT INTO completedchores(time_slot_id, iteration, message) VALUES (1000, 1, 'random');
+INSERT INTO completedchoresview(chore_name, iteration, message) VALUES ('test_chore', 2, 'random');
+INSERT INTO completedchoresview(chore_name, iteration, message) VALUES ('test_choreeeeeee', 1, 'random');
+-- INSERT INTO completedchores(time_slot_id, iteration, message) VALUES (1000, 1, 'random');
 
 INSERT INTO completedchores(time_slot_id, iteration, message) VALUES (1, 1, 'random');
+INSERT INTO completedchoresview(chore_name, iteration, message) VALUES ('test_chore', 1, 'random');
+
 INSERT INTO completedchores(time_slot_id, iteration, message) VALUES (2, 1, 'random');
 DELETE FROM completedchores WHERE TRUE;

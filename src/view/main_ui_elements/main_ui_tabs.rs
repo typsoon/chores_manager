@@ -32,5 +32,5 @@ pub fn build_main_ui_tabs() -> impl Widget<MainStateData> {
             ), // .debug_paint_layout(),
         )
         .with_tab("Schedule chores", Label::new("Not implemented yet"))
-        .with_tab("Complete chore", Label::new("Not implemented yet"))
+    // .with_tab("Complete chore", Label::new("Not implemented yet"))
 }

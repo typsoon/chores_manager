@@ -1,6 +1,7 @@
 use crate::model::psql_database_service_impl::create_psql_database_service;
 use crate::model::traits::{DatabaseService, ReadOnlyDatabaseService};
 use crate::model::types::ChoreTypeRecord;
+use crate::model::types::CompletedChoreData;
 use crate::model::types::{
     ChoreRecord, ChoresData, Credentials, DatabaseError, PersonRecord, ScheduledChoreRecord,
 };
@@ -36,6 +37,7 @@ impl DatabaseService for ViewModelImpl {
             fn add_one_time_chore(&mut self, one_time_chore_record: ChoreRecord);
             fn add_person(&mut self, person_record: PersonRecord);
             fn add_chore_type(&mut self, chore_type_record: ChoreTypeRecord);
+            fn complete_chore(&mut self, completed_chore_data: CompletedChoreData);
         }
     }
 }

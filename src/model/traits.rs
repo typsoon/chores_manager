@@ -16,4 +16,5 @@ pub trait DatabaseService: ReadOnlyDatabaseService {
     fn add_one_time_chore(&mut self, one_time_chore_record: ChoreRecord);
     fn add_person(&mut self, person_record: PersonRecord);
     fn add_chore_type(&mut self, chore_type_record: ChoreTypeRecord);
+    fn complete_chore(&mut self, completed_chore_data: CompletedChoreData);
 }

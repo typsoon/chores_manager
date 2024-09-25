@@ -3,7 +3,9 @@ use crate::view::main_ui_elements::main_ui_controller::build_main_ui;
 use crate::view::view_types::app_state::{AppState, MainStateLens};
 use crate::view::view_types::selectors::LOG_IN;
 use crate::viewmodel::view_model_impl::create_view_model;
-use druid::{AppDelegate, Command, DelegateCtx, Env, Handled, Target, WidgetExt, WindowDesc};
+use druid::{
+    AppDelegate, Command, DelegateCtx, Env, Handled, Target, WidgetExt, WindowDesc,
+};
 
 const MAIN_WINDOW_WIDTH: f64 = 1500.0;
 const MAIN_WINDOW_HEIGHT: f64 = 800.0;

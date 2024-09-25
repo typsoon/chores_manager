@@ -1,13 +1,14 @@
 use crate::model::traits::DatabaseService;
 use crate::model::traits::ReadOnlyDatabaseService;
 use crate::model::types::ChoreTypeRecord;
+use crate::model::types::CompletedChoreData;
 use crate::model::types::{
     ChoreRecord, DatabaseError, FullChoreDataRecord, PersonRecord, ScheduledChoreRecord,
 };
 use crate::model::types::{ChoresData, Credentials};
 use chrono::NaiveDate;
 use diesel::r2d2::{ConnectionManager, Error, ManageConnection, Pool};
-use diesel::sql_types::{Date, VarChar};
+use diesel::sql_types::{Date, Integer, VarChar};
 use diesel::{sql_query, PgConnection, RunQueryDsl};
 use dotenv::dotenv;
 use std::env;
@@ -118,5 +119,16 @@ impl DatabaseService for PSQLDatabaseService {
             .bind::<VarChar, _>(chore_type_record.chore_description())
             .execute(&mut self.connection_pool.get().unwrap())
             .unwrap();
+    }
+
+    fn complete_chore(&mut self, completed_chore_data: CompletedChoreData) {
+        sql_query(
+            "INSERT INTO CompletedChoresView(chore_name, iteration, message) VALUES ($1, $2, $3)",
+        )
+        .bind::<VarChar, _>(completed_chore_data.chore_name())
+        .bind::<Integer, _>(completed_chore_data.iteration())
+        .bind::<VarChar, _>(completed_chore_data.message())
+        .execute(&mut self.connection_pool.get().unwrap())
+        .unwrap();
     }
 }

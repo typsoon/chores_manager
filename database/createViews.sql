@@ -25,3 +25,7 @@ CREATE VIEW chores_manager.AllChoresView AS (
     UNION
     SELECT * FROM genchoresfromscheduled()
 );
+
+CREATE VIEW chores_manager.CompletedChoresView AS (
+    SELECT chore_name, iteration, message FROM completedchores JOIN chores_manager.ChoresNamesPrivateView USING (time_slot_id)
+);

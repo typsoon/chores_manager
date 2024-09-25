@@ -111,6 +111,42 @@ impl FullChoreDataRecord {
     pub fn was_completed(&self) -> bool {
         self.was_completed
     }
+
+    pub fn iteration(&self) -> i32 {
+        self.iteration
+    }
+}
+
+#[derive(QueryableByName, Clone, Debug, Eq, Hash, PartialEq, Default)]
+pub struct CompletedChoreData {
+    #[diesel(sql_type = VarChar)]
+    chore_name: String,
+    #[diesel(sql_type = Integer)]
+    iteration: i32,
+    #[diesel(sql_type = VarChar)]
+    message: String,
+}
+
+impl CompletedChoreData {
+    pub fn new(chore_name: String, iteration: i32, message: String) -> Self {
+        Self {
+            chore_name,
+            iteration,
+            message,
+        }
+    }
+
+    pub fn chore_name(&self) -> &str {
+        &self.chore_name
+    }
+
+    pub fn iteration(&self) -> i32 {
+        self.iteration
+    }
+
+    pub fn message(&self) -> &str {
+        &self.message
+    }
 }
 
 #[derive(Debug)]
