@@ -2,6 +2,7 @@ mod model;
 mod view;
 mod viewmodel;
 
+use crate::view::configure_env::configure_env;
 use crate::view::login_screen::build_login_screen;
 use crate::view::view_types::app_state::LoginDataLens;
 use druid::{AppLauncher, PlatformError, WidgetExt, WindowDesc};
@@ -21,7 +22,8 @@ fn main() -> Result<(), PlatformError> {
         WindowDesc::new(build_login_screen().lens(LoginDataLens)).title("Chores Manager");
 
     AppLauncher::with_window(main_window)
+        .configure_env(|env, _| configure_env(env))
         .delegate(WindowManager {})
         // .log_to_console()
-        .launch(AppState::new())
+        .launch(AppState::default())
 }

@@ -1,7 +1,7 @@
 use chrono::{Datelike, Days, Local, Months, NaiveDate, Weekday};
 use druid::Data;
 
-#[derive(Clone, Debug, Data, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, Data, PartialEq, Eq, Hash, Copy)]
 pub struct MonthData {
     #[data(eq)]
     first_day: NaiveDate,

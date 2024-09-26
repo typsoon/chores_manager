@@ -13,6 +13,7 @@ struct ViewModelImpl {
     database_service: Box<dyn DatabaseService>,
 }
 
+// #[allow(clippy::result_unit_err)]
 pub fn create_view_model(credentials: Credentials) -> Result<impl ViewModel + 'static, ()> {
     match create_psql_database_service(credentials) {
         Ok(database_service) => Ok(ViewModelImpl { database_service }),

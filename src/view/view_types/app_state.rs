@@ -2,15 +2,16 @@ use crate::model::types::{ChoresData, Credentials};
 use crate::view::view_types::app_state::AppState::{LoginState, MainState};
 use crate::view::view_types::utils::MonthData;
 use crate::view::view_types::wrappers::{
-    ChoreTypeRecordWrapper, ChoresDataKeyVal, FullChoreDataWrapper, ImportantWeeks,
+    ChoreTypeRecordWrapper, ChoresDataKeyVal, FullChoreDataWrapper, FullDayData, ImportantWeeks,
     NaiveDateWrapper, PersonRecordWrapper,
 };
 use crate::viewmodel::view_model_traits::ViewModel;
 use chrono::{Datelike, Days, Weekday};
-use druid::im::{vector, Vector};
+use druid::im::vector;
 use druid::{Data, Lens};
 use std::default::Default;
 use std::env;
+use std::sync::Arc;
 
 #[derive(Clone, Data)]
 pub enum AppState {
@@ -19,13 +20,9 @@ pub enum AppState {
 }
 
 impl AppState {
-    pub fn new() -> Self {
-        LoginState(LoginData::default())
-    }
-
     pub fn move_to_main_state(&mut self, viewmodel: &dyn ViewModel) {
         // *self = Main(MainState { chores_data: Default::default() });
-        let mut database_data = DatabaseData::new();
+        let mut database_data = DatabaseData::default();
         database_data.change_month(MonthData::current(), viewmodel);
         *self = MainState(MainStateData {
             database_data,
@@ -43,6 +40,12 @@ impl AppState {
     }
 }
 
+impl Default for AppState {
+    fn default() -> Self {
+        LoginState(LoginData::default())
+    }
+}
+
 #[derive(Clone, Data, Lens)]
 pub struct MainStateData {
     database_data: DatabaseData,
@@ -56,10 +59,6 @@ impl MainStateData {
 
     pub fn change_month(&mut self, month_data: MonthData, viewmodel: &dyn ViewModel) {
         self.database_data.change_month(month_data, viewmodel);
-    }
-
-    pub fn get_input_data(&self) -> &MainStateInputData {
-        &self.input_data
     }
 }
 
@@ -110,8 +109,8 @@ impl Default for LoginData {
 pub struct DatabaseData {
     #[data(eq)]
     chores_data: ChoresData,
-    people: Vector<PersonRecordWrapper>,
-    chores: Vector<ChoreTypeRecordWrapper>,
+    people: Arc<Vec<PersonRecordWrapper>>,
+    chores: Arc<Vec<ChoreTypeRecordWrapper>>,
     #[data(eq)]
     month_data: MonthData,
 }
@@ -135,24 +134,29 @@ impl DatabaseData {
                     .unwrap(),
             )
             .unwrap();
-        self.people = viewmodel
-            .get_people()
-            .unwrap()
-            .into_iter()
-            .map(PersonRecordWrapper::new)
-            .collect();
+        self.people = Arc::new(
+            viewmodel
+                .get_people()
+                .unwrap()
+                .into_iter()
+                .map(PersonRecordWrapper::new)
+                .collect(),
+        );
 
-        self.chores = viewmodel
-            .get_chores()
-            .unwrap()
-            .into_iter()
-            .map(ChoreTypeRecordWrapper::new)
-            .collect();
+        self.chores = Arc::new(
+            viewmodel
+                .get_chores()
+                .unwrap()
+                .into_iter()
+                .map(ChoreTypeRecordWrapper::new)
+                .collect(),
+        );
     }
 
     pub fn get_important_weeks(&self) -> ImportantWeeks {
         let mut answer = vector![];
         let important_days = self.month_data.get_important_days();
+
         important_days.iter().for_each(|x| {
             if x.weekday() == Weekday::Mon {
                 answer.push_back(vector![]);
@@ -162,7 +166,7 @@ impl DatabaseData {
                 .chores_data
                 .get(x)
                 .unwrap_or(&vec![])
-                .into_iter()
+                .iter()
                 .map(|x| FullChoreDataWrapper::new(x.clone()))
                 .collect();
 
@@ -170,28 +174,19 @@ impl DatabaseData {
                 .iter_mut()
                 .last()
                 .unwrap()
-                .push_back(ChoresDataKeyVal::new(
-                    NaiveDateWrapper::new(*x),
-                    chores,
-                    self.month_data.first_day().month().clone(),
+                .push_back(FullDayData::new(
+                    self.people.clone(),
+                    self.chores.clone(),
+                    ChoresDataKeyVal::new(
+                        NaiveDateWrapper::new(*x),
+                        chores,
+                        self.month_data.first_day().month(),
+                    ),
                 ));
         });
 
         answer
     }
-
-    pub fn new() -> Self {
-        Self {
-            chores_data: Default::default(),
-            people: Default::default(),
-            chores: Default::default(),
-            month_data: Default::default(),
-        }
-    }
-
-    // pub fn get_chores_data(&self) -> &ChoresData {
-    //     &self.chores_data
-    // }
 
     pub fn get_month_data(&self) -> &MonthData {
         &self.month_data

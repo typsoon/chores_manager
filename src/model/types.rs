@@ -6,7 +6,7 @@ use std::collections::HashMap;
 pub struct Credentials(pub String, pub String);
 pub type ChoresData = HashMap<NaiveDate, Vec<FullChoreDataRecord>>;
 
-#[derive(QueryableByName, Clone, Debug, Eq, Hash, PartialEq)]
+#[derive(QueryableByName, Clone, Debug, Eq, Hash, PartialEq, Default)]
 pub struct PersonRecord {
     #[diesel(sql_type = VarChar)]
     person_name: String,
@@ -22,7 +22,7 @@ impl PersonRecord {
     }
 }
 
-#[derive(QueryableByName, Debug, Eq, Hash, PartialEq, Clone)]
+#[derive(QueryableByName, Debug, Eq, Hash, PartialEq, Clone, Default)]
 pub struct ChoreTypeRecord {
     #[diesel(sql_type = VarChar)]
     chore_name: String,
@@ -96,21 +96,21 @@ pub struct ScheduledChoreRecord {
 }
 
 impl ScheduledChoreRecord {
-    pub fn new(
-        person_name: String,
-        chore_name: String,
-        interval: Duration,
-        date_from: NaiveDateTime,
-        date_to: NaiveDateTime,
-    ) -> Self {
-        Self {
-            person_name,
-            chore_name,
-            interval,
-            date_from,
-            date_to,
-        }
-    }
+    // pub fn new(
+    //     person_name: String,
+    //     chore_name: String,
+    //     interval: Duration,
+    //     date_from: NaiveDateTime,
+    //     date_to: NaiveDateTime,
+    // ) -> Self {
+    //     Self {
+    //         person_name,
+    //         chore_name,
+    //         interval,
+    //         date_from,
+    //         date_to,
+    //     }
+    // }
 
     pub fn person_name(&self) -> &str {
         &self.person_name
@@ -211,5 +211,6 @@ impl CompletedChoreData {
 
 #[derive(Debug)]
 pub enum DatabaseError {
+    #[allow(dead_code)]
     Error(diesel::result::Error),
 }

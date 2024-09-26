@@ -1,10 +1,12 @@
 use crate::model::types::{ChoreTypeRecord, FullChoreDataRecord, PersonRecord};
-use chrono::NaiveDate;
+use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use druid::im::Vector;
 use druid::{Data, Lens};
+use std::fmt::{Display, Formatter};
 use std::ops::Deref;
+use std::sync::Arc;
 
-#[derive(Clone, Data)]
+#[derive(Clone, Data, Default)]
 pub struct PersonRecordWrapper {
     #[data(eq)]
     person_record: PersonRecord,
@@ -24,7 +26,13 @@ impl Deref for PersonRecordWrapper {
     }
 }
 
-#[derive(Clone, Data)]
+impl Display for PersonRecordWrapper {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        self.person_record.person_name().fmt(f)
+    }
+}
+
+#[derive(Clone, Data, Default)]
 pub struct ChoreTypeRecordWrapper {
     #[data(eq)]
     chore_record: ChoreTypeRecord,
@@ -117,4 +125,38 @@ impl ChoresDataKeyVal {
     }
 }
 
-pub type ImportantWeeks = Vector<Vector<ChoresDataKeyVal>>;
+#[derive(Clone, Data, Lens)]
+pub struct FullDayData {
+    people: Arc<Vec<PersonRecordWrapper>>,
+    chores: Arc<Vec<ChoreTypeRecordWrapper>>,
+    keyval: ChoresDataKeyVal,
+}
+
+impl FullDayData {
+    pub fn new(
+        people: Arc<Vec<PersonRecordWrapper>>,
+        chores: Arc<Vec<ChoreTypeRecordWrapper>>,
+        keyval: ChoresDataKeyVal,
+    ) -> Self {
+        Self {
+            people,
+            chores,
+            keyval,
+        }
+    }
+
+    pub fn get_chores(&self) -> &Arc<Vec<ChoreTypeRecordWrapper>> {
+        &self.chores
+    }
+
+    pub fn get_people(&self) -> &Arc<Vec<PersonRecordWrapper>> {
+        &self.people
+    }
+
+    pub fn get_day(&self) -> NaiveDateTime {
+        self.keyval.day.and_time(NaiveTime::from_hms_opt(0, 0, 0).unwrap())
+    }
+}
+
+// pub type ImportantWeeks = Vector<Vector<ChoresDataKeyVal>>;
+pub type ImportantWeeks = Vector<Vector<FullDayData>>;

@@ -42,10 +42,10 @@ fn establish_connection(
 
 pub fn create_psql_database_service(
     credentials: Credentials,
-) -> Result<Box<dyn DatabaseService>, ()> {
+) -> Result<Box<dyn DatabaseService>, Error> {
     match establish_connection(credentials) {
         Ok(connection_pool) => Ok(Box::new(PSQLDatabaseService { connection_pool })),
-        Err(_) => Err(()),
+        Err(err) => Err(err),
     }
 }
 

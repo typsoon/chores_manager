@@ -30,7 +30,7 @@ impl<W: Widget<MainStateData>> Controller<MainStateData, W> for MainUIController
     ) {
         if let Event::Command(cmd) = event {
             if let Some(month_data) = cmd.get(CHANGE_MONTH) {
-                data.change_month(month_data.clone(), self.viewmodel.deref());
+                data.change_month(*month_data, self.viewmodel.deref());
             }
 
             if let Some(chore_type_record) = cmd.get(ADD_CHORE_TYPE) {

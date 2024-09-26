@@ -86,7 +86,7 @@ $$
             RAISE EXCEPTION 'No such chore in database';
         END IF;
 
-        SELECT pc.mapping_id INTO mapping_id FROM PeopleChores pc WHERE (pc.chore_id, pc.person_id) = (func_person_id, func_chore_id);
+        SELECT pc.mapping_id INTO mapping_id FROM PeopleChores pc WHERE pc.chore_id = func_chore_id AND pc.person_id = func_person_id;
 
         IF mapping_id IS NULL THEN
             INSERT INTO PeopleChores(person_id, chore_id) VALUES (func_person_id, func_chore_id) RETURNING PeopleChores.mapping_id INTO mapping_id;

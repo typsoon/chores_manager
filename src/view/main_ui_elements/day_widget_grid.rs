@@ -1,22 +1,18 @@
+use crate::view::configure_env::{
+    CALENDAR_ITEM_HEIGHT, CALENDAR_ITEM_WIDTH, CHORES_DESC_TEXT_SIZE, CHORE_LIST_HEIGHT,
+};
 use crate::view::main_ui_elements::sub_window_widget;
 use crate::view::main_ui_elements::sub_window_widget::build_sub_window_widget;
 use crate::view::view_types::app_state::DatabaseData;
-use crate::view::view_types::wrappers::{ChoresDataKeyVal, FullChoreDataWrapper, ImportantWeeks};
+use crate::view::view_types::wrappers::{
+    ChoresDataKeyVal, FullChoreDataWrapper, FullDayData, ImportantWeeks,
+};
 use chrono::Datelike;
 use druid::im::{vector, Vector};
 use druid::widget::{BackgroundBrush, Controller, Flex, Label, List, Painter};
 use druid::{
     Color, Data, Env, Lens, Size, UpdateCtx, Widget, WidgetExt, WindowConfig, WindowLevel,
 };
-
-const CELL_WIDTH: f64 = 200.0;
-const CELL_HEIGHT: f64 = 60.0;
-const DAY_WIDGET_WIDTH: f64 = CELL_WIDTH;
-const DAY_WIDGET_HEIGHT: f64 = 100.0;
-const DAY_WIDGET_ITEM_WIDTH: f64 = 85.0;
-const DAY_WIDGET_ITEM_HEIGHT: f64 = 20.0;
-const CHORES_DESC_TEXT_SIZE: f64 = 10.0;
-const CHORE_LIST_HEIGHT: f64 = 72.5;
 
 struct TempController;
 
@@ -60,31 +56,34 @@ impl Lens<DatabaseData, ImportantWeeks> for ImportantWeeksLens {
 pub fn build_day_widget_grid() -> impl Widget<DatabaseData> {
     List::new(|| {
         List::new(|| {
-            let day_widget_box_painter =
-                Painter::new(move |ctx: &mut _, keyval: &ChoresDataKeyVal, env: &_| {
-                    BackgroundBrush::Color(get_container_color(keyval)).paint(ctx, keyval, env);
-                });
-
             Flex::column()
                 .on_added(|column, _, keyval: &ChoresDataKeyVal, &_| {
                     column.add_child(
-                        Label::new(keyval.get_day().day().to_string()).padding((5., 0., 5., 0.)),
+                        Label::new(keyval.get_day().day().to_string())
+                            // .with_text_color(Color::BLACK)
+                            .with_text_color(Color::rgb(0.4, 0.4, 0.4))
+                            .padding((5., 0., 5., 0.)),
                     );
 
                     column.add_child(get_chore_list());
                 })
-                .background(day_widget_box_painter)
+                .background(Painter::new(
+                    move |ctx: &mut _, keyval: &ChoresDataKeyVal, env: &_| {
+                        BackgroundBrush::Color(get_container_color(keyval)).paint(ctx, keyval, env);
+                    },
+                ))
+                .lens(FullDayData::keyval)
                 .border(Color::BLACK, 2.0)
                 .rounded(5.)
-                .fix_size(DAY_WIDGET_WIDTH, DAY_WIDGET_HEIGHT)
-                .on_click(|ctx, keyval: &mut ChoresDataKeyVal, env| {
+                .fix_size(CALENDAR_ITEM_WIDTH, CALENDAR_ITEM_HEIGHT)
+                .on_click(|ctx, full_day_data: &mut FullDayData, env| {
                     ctx.new_sub_window(
                         WindowConfig::default()
                             .show_titlebar(true)
                             .window_size(Size::new(500., 500.))
                             .set_level(WindowLevel::AppWindow),
                         build_sub_window_widget(),
-                        keyval.clone(),
+                        full_day_data.clone(),
                         env.clone(),
                     );
                 })
@@ -101,6 +100,7 @@ fn get_chore_list() -> impl Widget<ChoresDataKeyVal> {
         Label::new(|item: &FullChoreDataWrapper, _env: &_| {
             format!("{}\t{}", item.chore_name(), item.person_name())
         })
+        // .with_text_color(Color::BLACK)
         .with_text_size(CHORES_DESC_TEXT_SIZE)
         .background(sub_window_widget::get_chore_box_painter())
         .padding((0., 5., 0., 0.))
