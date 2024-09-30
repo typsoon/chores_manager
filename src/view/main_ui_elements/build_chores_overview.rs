@@ -1,13 +1,10 @@
-use crate::view::configure_env::{DAY_NAME_CELL_HEIGHT, DAY_NAME_CELL_WIDTH, DAY_NAME_FONT_SIZE};
 use crate::view::main_ui_elements::day_widget_grid::build_day_widget_grid;
-use crate::view::view_types::app_state::DatabaseData;
+use crate::view::view_types::app_state::{DatabaseData, ImportantWeeksNewLens};
 use crate::view::view_types::selectors::CHANGE_MONTH;
-use druid::im::{vector, Vector};
-use druid::lens::Constant;
-use druid::widget::{Button, Flex, Label, List};
-use druid::{Color, Widget, WidgetExt};
+use druid::widget::{Button, Flex, Label};
+use druid::{Widget, WidgetExt};
 
-pub fn build_calendar_widget() -> impl Widget<DatabaseData> {
+pub fn build_chores_overview() -> impl Widget<DatabaseData> {
     Flex::column()
         .with_child(
             Flex::row()
@@ -35,24 +32,6 @@ pub fn build_calendar_widget() -> impl Widget<DatabaseData> {
                 )),
         )
         .with_default_spacer()
-        .with_child(
-            List::new(|| {
-                Label::new(|day_name: &String, _: &_| day_name.clone())
-                    .with_text_size(DAY_NAME_FONT_SIZE)
-                    // .with_text_color(Color::BLACK)
-                    .center()
-                    .background(Color::rgb(0.6, 0.8, 0.9))
-                    .border(Color::BLACK, 2.0)
-                    .rounded(5.0)
-                    .fix_size(DAY_NAME_CELL_WIDTH, DAY_NAME_CELL_HEIGHT)
-            })
-            .horizontal()
-            .lens(Constant(
-                vector!["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-                    .into_iter()
-                    .map(String::from)
-                    .collect::<Vector<String>>(),
-            )),
-        )
-        .with_child(build_day_widget_grid())
+        // .with_child(build_day_widget_grid().lens(ImportantWeeksLens))
+        .with_child(build_day_widget_grid().lens(ImportantWeeksNewLens))
 }

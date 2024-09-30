@@ -2,12 +2,11 @@ use crate::model::types::{ChoresData, Credentials};
 use crate::view::view_types::app_state::AppState::{LoginState, MainState};
 use crate::view::view_types::utils::MonthData;
 use crate::view::view_types::wrappers::{
-    ChoreTypeRecordWrapper, ChoresDataKeyVal, FullChoreDataWrapper, FullDayData, ImportantWeeks,
+    ChoreTypeRecordWrapper, ChoresDataKeyVal, FullChoreDataWrapper, FullDayData, ImportantDays,
     NaiveDateWrapper, PersonRecordWrapper,
 };
 use crate::viewmodel::view_model_traits::ViewModel;
-use chrono::{Datelike, Days, Weekday};
-use druid::im::vector;
+use chrono::{Datelike, Days};
 use druid::{Data, Lens};
 use std::default::Default;
 use std::env;
@@ -153,28 +152,21 @@ impl DatabaseData {
         );
     }
 
-    pub fn get_important_weeks(&self) -> ImportantWeeks {
-        let mut answer = vector![];
+    pub fn get_important_days(&self) -> ImportantDays {
         let important_days = self.month_data.get_important_days();
 
-        important_days.iter().for_each(|x| {
-            if x.weekday() == Weekday::Mon {
-                answer.push_back(vector![]);
-            }
+        important_days
+            .iter()
+            .map(|x| {
+                let chores = self
+                    .chores_data
+                    .get(x)
+                    .unwrap_or(&vec![])
+                    .iter()
+                    .map(|x| FullChoreDataWrapper::new(x.clone()))
+                    .collect();
 
-            let chores = self
-                .chores_data
-                .get(x)
-                .unwrap_or(&vec![])
-                .iter()
-                .map(|x| FullChoreDataWrapper::new(x.clone()))
-                .collect();
-
-            answer
-                .iter_mut()
-                .last()
-                .unwrap()
-                .push_back(FullDayData::new(
+                FullDayData::new(
                     self.people.clone(),
                     self.chores.clone(),
                     ChoresDataKeyVal::new(
@@ -182,10 +174,9 @@ impl DatabaseData {
                         chores,
                         self.month_data.first_day().month(),
                     ),
-                ));
-        });
-
-        answer
+                )
+            })
+            .collect()
     }
 
     pub fn get_month_data(&self) -> &MonthData {
@@ -256,5 +247,17 @@ impl Lens<AppState, MainStateData> for MainStateLens {
         } else {
             unreachable!("AppState not in main state")
         }
+    }
+}
+
+pub struct ImportantWeeksNewLens;
+
+impl Lens<DatabaseData, ImportantDays> for ImportantWeeksNewLens {
+    fn with<V, F: FnOnce(&ImportantDays) -> V>(&self, data: &DatabaseData, f: F) -> V {
+        f(&data.get_important_days())
+    }
+
+    fn with_mut<V, F: FnOnce(&mut ImportantDays) -> V>(&self, data: &mut DatabaseData, f: F) -> V {
+        f(&mut data.get_important_days())
     }
 }

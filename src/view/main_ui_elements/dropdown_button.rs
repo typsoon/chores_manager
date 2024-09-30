@@ -17,7 +17,11 @@ struct DropdownData<T: Data + Display + Default + Clone> {
 
 impl<T: Data + Display + Default + Clone> DropdownData<T> {
     pub fn new(options_and_selected: (T, Vector<T>)) -> Self {
-        Self { selected: 0, options_and_selected, dropped: false }
+        Self {
+            selected: 0,
+            options_and_selected,
+            dropped: false,
+        }
     }
 }
 
@@ -48,7 +52,12 @@ impl<T: Data + Display + Default + Clone, W: Widget<DropdownData<T>>> Controller
             if let Some(chosen_idx) = cmd.get(VARIANT_CHOSEN) {
                 data.selected = *chosen_idx;
                 data.dropped = false;
-                data.options_and_selected.0 = data.options_and_selected.1.get(data.selected).cloned().unwrap_or_default();
+                data.options_and_selected.0 = data
+                    .options_and_selected
+                    .1
+                    .get(data.selected)
+                    .cloned()
+                    .unwrap_or_default();
                 ctx.set_handled();
                 ctx.request_update();
             }
@@ -68,8 +77,7 @@ pub fn get_dropdown_button<T: Data + Display + Default + Clone>() -> impl Widget
                 Label::new(|item: &OptionsAndSelected<T>, _env: &_| {
                     format!(
                         "{}",
-                        item.0
-                        // item.options_and_selected.get(item.selected).cloned().unwrap_or_default()
+                        item.0 // item.options_and_selected.get(item.selected).cloned().unwrap_or_default()
                     )
                 })
                 .with_text_color(Color::BLACK)

@@ -17,7 +17,7 @@ impl MonthData {
         }
     }
 
-    fn get_from_date_like(date_like: impl Datelike) -> Result<Self, ()> {
+    pub fn get_from_date_like(date_like: impl Datelike) -> Result<Self, ()> {
         let first_day = NaiveDate::from_ymd_opt(date_like.year(), date_like.month(), 1).ok_or(())?;
         let next_month = if date_like.month() == 12 {
             NaiveDate::from_ymd_opt(date_like.year() + 1, 1, 1)

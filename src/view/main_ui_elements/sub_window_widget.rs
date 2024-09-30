@@ -106,8 +106,18 @@ struct AddChoresWidgetPrivateData {
 impl AddChoresWidgetPrivateData {
     pub fn new(full_day_data: FullDayData) -> Self {
         Self {
-            selected_person: full_day_data.get_people().first().cloned().unwrap_or_default(),
-            selected_chore_name: full_day_data.get_chores().first().cloned().unwrap_or_default().chore_name().to_string(),
+            selected_person: full_day_data
+                .get_people()
+                .first()
+                .cloned()
+                .unwrap_or_default(),
+            selected_chore_name: full_day_data
+                .get_chores()
+                .first()
+                .cloned()
+                .unwrap_or_default()
+                .chore_name()
+                .to_string(),
             full_day_data,
         }
     }
@@ -121,58 +131,55 @@ fn build_add_chores_widget() -> impl Widget<FullDayData> {
 
         // AddChoresWidgetPrivateData::full_day_data.then(FullDayData::people),
         Flex::row()
-            .with_child(
-                get_dropdown_button().lens(Identity.map(
-                    |data: &AddChoresWidgetPrivateData| {
-                        (
-                            data.selected_person.clone(),
-                            data.full_day_data.get_people()
-                                        .iter()
-                                        .cloned()
-                                        .collect::<Vector<PersonRecordWrapper>>()
-                        )
-                    },
-                    |data: &mut AddChoresWidgetPrivateData, new_data: (PersonRecordWrapper, _)| {
-                        data.selected_person = new_data.0;
-                        // data.full_day_data.get_people() = Arc::new(new_data.1.iter().cloned().collect());
-                    },
-                    ),
-                ),
-            )
+            .with_child(get_dropdown_button().lens(Identity.map(
+                |data: &AddChoresWidgetPrivateData| {
+                    (
+                        data.selected_person.clone(),
+                        data.full_day_data
+                            .get_people()
+                            .iter()
+                            .cloned()
+                            .collect::<Vector<PersonRecordWrapper>>(),
+                    )
+                },
+                |data: &mut AddChoresWidgetPrivateData, new_data: (PersonRecordWrapper, _)| {
+                    data.selected_person = new_data.0;
+                    // data.full_day_data.get_people() = Arc::new(new_data.1.iter().cloned().collect());
+                },
+            )))
             .with_default_spacer()
-            .with_child(
-                get_dropdown_button().lens(
-                    Identity.map(
-                        |data: &AddChoresWidgetPrivateData| {
-                            (
+            .with_child(get_dropdown_button().lens(Identity.map(
+                |data: &AddChoresWidgetPrivateData| {
+                    (
+                        data.selected_chore_name.clone(),
+                        data.full_day_data
+                            .get_chores()
+                            .iter()
+                            .map(|chore_type_wrapper: &ChoreTypeRecordWrapper| {
+                                chore_type_wrapper.chore_name().to_string()
+                            })
+                            .collect::<Vector<String>>(),
+                    )
+                },
+                |data: &mut AddChoresWidgetPrivateData, new_data: (String, _)| {
+                    data.selected_chore_name = new_data.0;
+                    // data.full_day_data.get_chores() = Arc::new(new_data.1.iter().cloned().collect());
+                },
+            )))
+            .with_default_spacer()
+            .with_child(Button::new("Add one time chore").on_click(
+                |ctx: &mut EventCtx, data: &mut AddChoresWidgetPrivateData, _| {
+                    ctx.submit_command(
+                        ADD_ONE_TIME_CHORE
+                            .with(OneTimeChoreRecord::new(
+                                data.selected_person.to_string(),
                                 data.selected_chore_name.clone(),
-                                data.full_day_data.get_chores()
-                                            .iter()
-                                            .map(|chore_type_wrapper: &ChoreTypeRecordWrapper| {
-                                                chore_type_wrapper.chore_name().to_string()
-                                            })
-                                            .collect::<Vector<String>>()
-                            )
-                        },
-                        |data: &mut AddChoresWidgetPrivateData, new_data: (String, _)| {
-                            data.selected_chore_name = new_data.0;
-                            // data.full_day_data.get_chores() = Arc::new(new_data.1.iter().cloned().collect());
-                        },
-                    ),
-                ),
-            )
-            .with_default_spacer()
-            .with_child(Button::new("Add one time chore").on_click(|ctx: &mut EventCtx, data: &mut AddChoresWidgetPrivateData, _| {
-                ctx.submit_command(
-                    ADD_ONE_TIME_CHORE
-                        .with(OneTimeChoreRecord::new(
-                            data.selected_person.to_string(),
-                            data.selected_chore_name.clone(),
-                            data.full_day_data.get_day(),
-                        ))
-                        .to(Target::Global),
-                )
-            })),
+                                data.full_day_data.get_day(),
+                            ))
+                            .to(Target::Global),
+                    )
+                },
+            )),
     )
 }
 

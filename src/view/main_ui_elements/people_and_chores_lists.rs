@@ -1,13 +1,13 @@
 use crate::model::types::{ChoreTypeRecord, PersonRecord};
+use crate::view::configure_env::{
+    TAB_CHORE_DESCRIPTION_WIDTH, TAB_CHORE_LABEL_WIDTH, TAB_ITEM_LIST_WIDTH,
+    TAB_PERSON_NAME_FIELD_WIDTH,
+};
 use crate::view::view_types::app_state::{DatabaseData, MainStateData, MainStateInputData};
 use crate::view::view_types::selectors::{ADD_CHORE_TYPE, ADD_PERSON};
 use crate::view::view_types::wrappers::{ChoreTypeRecordWrapper, PersonRecordWrapper};
-use druid::widget::{Button, Flex, Label, List, Scroll, TextBox};
+use druid::widget::{Button, Flex, Label, LineBreaking, List, Scroll, TextBox};
 use druid::{Widget, WidgetExt};
-
-const ITEM_LIST_WIDTH: f64 = 750.;
-const PERSON_NAME_FIELD_WIDTH: f64 = 200.;
-const CHORE_DESCRIPTION_WIDTH: f64 = 400.;
 
 pub fn build_list_of_people() -> impl Widget<MainStateData> {
     Flex::column()
@@ -41,13 +41,13 @@ pub fn build_list_of_people() -> impl Widget<MainStateData> {
                 .with_child(
                     TextBox::new()
                         .with_placeholder("Person name")
-                        .fix_width(PERSON_NAME_FIELD_WIDTH)
+                        .fix_width(TAB_PERSON_NAME_FIELD_WIDTH)
                         .lens(MainStateInputData::added_person_name),
                 )
                 .expand_width()
                 .lens(MainStateData::input_data),
         )
-        .fix_width(ITEM_LIST_WIDTH)
+        .fix_width(TAB_ITEM_LIST_WIDTH)
 }
 
 pub fn build_list_of_chores() -> impl Widget<MainStateData> {
@@ -60,6 +60,8 @@ pub fn build_list_of_chores() -> impl Widget<MainStateData> {
                     Label::new(|item: &ChoreTypeRecordWrapper, _env: &_| {
                         format!("{}\n{}", item.chore_name(), item.chore_description())
                     })
+                    .with_line_break_mode(LineBreaking::WordWrap)
+                    .fix_width(TAB_CHORE_LABEL_WIDTH)
                     .padding((0., 10., 0., 0.))
                 })
                 .lens(DatabaseData::chores),
@@ -82,7 +84,7 @@ pub fn build_list_of_chores() -> impl Widget<MainStateData> {
                 .with_child(
                     TextBox::new()
                         .with_placeholder("Chore name")
-                        .fix_width(PERSON_NAME_FIELD_WIDTH)
+                        .fix_width(TAB_PERSON_NAME_FIELD_WIDTH)
                         .lens(MainStateInputData::added_chore_type_name),
                 )
                 .with_default_spacer()
@@ -90,10 +92,10 @@ pub fn build_list_of_chores() -> impl Widget<MainStateData> {
                     TextBox::multiline()
                         .with_placeholder("Chore description")
                         // .expand_width()
-                        .fix_width(CHORE_DESCRIPTION_WIDTH)
+                        .fix_width(TAB_CHORE_DESCRIPTION_WIDTH)
                         .lens(MainStateInputData::added_chore_description),
                 )
                 .lens(MainStateData::input_data),
         )
-        .fix_width(ITEM_LIST_WIDTH)
+        .fix_width(TAB_ITEM_LIST_WIDTH)
 }

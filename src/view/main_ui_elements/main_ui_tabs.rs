@@ -1,4 +1,4 @@
-use crate::view::main_ui_elements::calendar_widget::build_calendar_widget;
+use crate::view::main_ui_elements::build_chores_overview::build_chores_overview;
 use crate::view::main_ui_elements::people_and_chores_lists::{
     build_list_of_chores, build_list_of_people,
 };
@@ -16,7 +16,7 @@ pub fn build_main_ui_tabs() -> impl Widget<MainStateData> {
         .with_transition(Slide(Duration::from_millis(250).as_nanos() as u64))
         .with_tab(
             "Chores Calendar",
-            build_calendar_widget().lens(MainStateData::database_data),
+            build_chores_overview().lens(MainStateData::database_data),
         )
         // .with_tab("People", build_list_of_people())
         // .with_tab("Chores", build_list_of_chores())

@@ -154,9 +154,10 @@ impl FullDayData {
     }
 
     pub fn get_day(&self) -> NaiveDateTime {
-        self.keyval.day.and_time(NaiveTime::from_hms_opt(0, 0, 0).unwrap())
+        self.keyval
+            .day
+            .and_time(NaiveTime::from_hms_opt(0, 0, 0).unwrap())
     }
 }
 
-// pub type ImportantWeeks = Vector<Vector<ChoresDataKeyVal>>;
-pub type ImportantWeeks = Vector<Vector<FullDayData>>;
+pub type ImportantDays = Vector<FullDayData>;
