@@ -1,7 +1,7 @@
 use crate::model::types::PersonRecord;
 use crate::model::types::{ChoreTypeRecord, CompletedChoreData};
 use crate::model::types::{OneTimeChoreRecord, ScheduledChoreRecord};
-use crate::view::view_types::utils::MonthData;
+use crate::view::utils::date_utils::MonthData;
 use druid::Selector;
 
 pub const LOG_IN: Selector = Selector::new("log-in");

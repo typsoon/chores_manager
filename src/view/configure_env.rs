@@ -42,6 +42,8 @@ pub const SCHEDULING_WIDGET_WEEKDAY_LABEL_WIDTH: Key<f64> =
     Key::new("scheduling_widget_weekday_label_width");
 pub const SCHEDULING_WIDGET_WEEKDAY_LABEL_HEIGHT: Key<f64> =
     Key::new("scheduling_widget_weekday_label_height");
+pub const SCHEDULING_WIDGET_DAY_WIDGET_HEIGHT: Key<f64> =
+    Key::new("scheduling_widget_day_widget_height");
 
 // Tabs setup
 pub const TAB_CHORE_LABEL_WIDTH: Key<f64> = Key::new("chore_label_width");
@@ -88,6 +90,7 @@ pub fn configure_env(env: &mut Env) {
     );
     env.set(SCHEDULING_WIDGET_WEEKDAY_LABEL_WIDTH, 85.);
     env.set(SCHEDULING_WIDGET_WEEKDAY_LABEL_HEIGHT, 20.);
+    env.set(SCHEDULING_WIDGET_DAY_WIDGET_HEIGHT, 50.);
 
     //
     env.set(TAB_CHORE_LABEL_WIDTH, 400.0);

@@ -1,7 +1,6 @@
 use druid::im::Vector;
-use druid::lens::LensExt;
 use druid::widget::{Controller, Either, Flex, Label, List, Scope};
-use druid::{Color, Data, EventCtx, Lens, Selector, Target, Widget, WidgetExt, WidgetId};
+use druid::{Color, Data, EventCtx, Lens, LensExt, Selector, Target, Widget, WidgetExt, WidgetId};
 use std::fmt::Display;
 
 const VARIANT_CHOSEN: Selector<usize> = Selector::new("variant_chosen");
@@ -24,16 +23,6 @@ impl<T: Data + Display + Default + Clone> DropdownData<T> {
         }
     }
 }
-
-// impl<T: Data + Display + Default + Clone> DropdownData<T> {
-//     pub fn new(options: Vector<T>) -> Self {
-//         Self {
-//             selected: 0,
-//             options_and_selected: options,
-//             dropped: false,
-//         }
-//     }
-// }
 
 struct DropdownController;
 
@@ -74,7 +63,7 @@ pub fn get_dropdown_button<T: Data + Display + Default + Clone>() -> impl Widget
         DropdownData::options_and_selected,
         Flex::column()
             .with_child(
-                Label::new(|item: &OptionsAndSelected<T>, _env: &_| {
+                Label::dynamic(|item: &OptionsAndSelected<T>, _env: &_| {
                     format!(
                         "{}",
                         item.0 // item.options_and_selected.get(item.selected).cloned().unwrap_or_default()
@@ -93,7 +82,7 @@ pub fn get_dropdown_button<T: Data + Display + Default + Clone>() -> impl Widget
             .with_child(Either::new(
                 |data: &DropdownData<T>, _| data.dropped,
                 List::new(move || {
-                    Label::new(move |item: &(usize, T), _env: &_| format!("{}", item.1))
+                    Label::dynamic(move |item: &(usize, T), _env: &_| format!("{}", item.1))
                         .padding((5., 5., 5., 5.))
                         .on_click(move |ctx: &mut EventCtx, data: &mut _, _env| {
                             ctx.submit_command(
@@ -120,3 +109,15 @@ pub fn get_dropdown_button<T: Data + Display + Default + Clone>() -> impl Widget
             .controller(DropdownController),
     )
 }
+
+// impl<T: Data + Display + Default + Clone> DropdownData<T> {
+//     pub fn new(options: Vector<T>) -> Self {
+//         Self {
+//             selected: 0,
+//             options_and_selected: options,
+//             dropped: false,
+//         }
+//     }
+// }
+
+// pub fn get_dropdown_button<T: Data + Display + Default + Clone>() -> impl Widget<Vector<T>> {

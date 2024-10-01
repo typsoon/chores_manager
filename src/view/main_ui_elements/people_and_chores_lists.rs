@@ -16,7 +16,7 @@ pub fn build_list_of_people() -> impl Widget<MainStateData> {
         .with_child(
             Scroll::new(
                 List::new(|| {
-                    Label::new(|item: &PersonRecordWrapper, _env: &_| {
+                    Label::dynamic(|item: &PersonRecordWrapper, _env: &_| {
                         item.person_name().to_string()
                     })
                     .padding((0., 10., 0., 0.))
@@ -57,7 +57,7 @@ pub fn build_list_of_chores() -> impl Widget<MainStateData> {
         .with_child(
             Scroll::new(
                 List::new(|| {
-                    Label::new(|item: &ChoreTypeRecordWrapper, _env: &_| {
+                    Label::dynamic(|item: &ChoreTypeRecordWrapper, _env: &_| {
                         format!("{}\n{}", item.chore_name(), item.chore_description())
                     })
                     .with_line_break_mode(LineBreaking::WordWrap)

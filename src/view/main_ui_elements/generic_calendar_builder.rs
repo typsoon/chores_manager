@@ -1,10 +1,33 @@
 use druid::im::{vector, Vector};
 use druid::lens::Constant;
-use druid::widget::{Flex, List, ListIter};
-use druid::Lens;
+use druid::widget::{Controller, Flex, List, ListIter};
 use druid::{Data, Widget, WidgetExt};
+use druid::{Env, Lens, UpdateCtx};
 use std::mem;
 use std::rc::Rc;
+
+pub struct TempController<D> {
+    _data: std::marker::PhantomData<D>,
+}
+
+impl<D> TempController<D> {
+    pub fn new() -> Self {
+        Self {
+            _data: std::marker::PhantomData,
+        }
+    }
+}
+
+// TODO: delete this controller and find a different way
+/// Disgusting fix but it works
+
+impl<D: Data, LD: ListIter<D> + Default, W: Widget<LD>> Controller<LD, W> for TempController<D> {
+    fn update(&mut self, child: &mut W, ctx: &mut UpdateCtx, old_data: &LD, data: &LD, env: &Env) {
+        child.update(ctx, old_data, &Default::default(), env);
+        child.update(ctx, &Default::default(), data, env);
+        // child.update(ctx, old_data, data, env);
+    }
+}
 
 struct ToWeeksLens;
 
@@ -42,7 +65,7 @@ where
     WS: Widget<String> + 'static,
     D: Data,
     WD: Widget<D> + 'static,
-    LD: ListIter<D>,
+    LD: ListIter<D> + Default,
 {
     let weekdays = Vector::from(
         vector!["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
@@ -65,4 +88,5 @@ where
             })
             .lens(ToWeeksLens),
         )
+        .controller(TempController::new())
 }

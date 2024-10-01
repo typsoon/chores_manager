@@ -5,7 +5,7 @@ use crate::view::main_ui_elements::people_and_chores_lists::{
 use crate::view::view_types::app_state::MainStateData;
 use druid::widget::TabsEdge::Leading;
 use druid::widget::TabsTransition::Slide;
-use druid::widget::{Align, Axis, Flex, Label, Tabs};
+use druid::widget::{Align, Axis, Flex, Tabs};
 use druid::{UnitPoint, Widget, WidgetExt};
 use std::time::Duration;
 
@@ -31,6 +31,6 @@ pub fn build_main_ui_tabs() -> impl Widget<MainStateData> {
                     .expand(),
             ), // .debug_paint_layout(),
         )
-        .with_tab("Schedule chores", Label::new("Not implemented yet"))
+    // .with_tab("Schedule chores", Label::new("Not implemented yet"))
     // .with_tab("Complete chore", Label::new("Not implemented yet"))
 }

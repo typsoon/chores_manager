@@ -1,6 +1,6 @@
 use crate::model::types::{ChoresData, Credentials};
+use crate::view::utils::date_utils::MonthData;
 use crate::view::view_types::app_state::AppState::{LoginState, MainState};
-use crate::view::view_types::utils::MonthData;
 use crate::view::view_types::wrappers::{
     ChoreTypeRecordWrapper, ChoresDataKeyVal, FullChoreDataWrapper, FullDayData, ImportantDays,
     NaiveDateWrapper, PersonRecordWrapper,

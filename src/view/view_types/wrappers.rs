@@ -74,7 +74,7 @@ impl Deref for FullChoreDataWrapper {
     }
 }
 
-#[derive(Clone, Data)]
+#[derive(Clone, Data, Copy)]
 pub struct NaiveDateWrapper {
     #[data(eq)]
     date: NaiveDate,
